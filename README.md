@@ -5,7 +5,7 @@ This package was developed to ease the process of creating a pipeline to perform
 
 ## Installation
 ```bash
-git clone https://gitlab.bio.di.uminho.pt/biotextminingpy/biotmpy.git
+git clone https://github.com/BioSystemsUM/biotmpy.git
 ```
 ## Requirements
 To use BioTMPy you first need to install either [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), and then create a conda environment with the "conda_environment.yml" file. This file will allow you to install the packages required to use all the available features of this tool (Note: The Tensorflow version used in this environment supports computations on one or more GPUs). 
