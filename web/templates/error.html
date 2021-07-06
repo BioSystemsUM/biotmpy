@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>BioTMPy</title>
+	<link rel="icon" href="data:,">
+	<script src="../static/jquery.min.js"></script>
+	<script src="../static/conditional.js"></script>	
+	<link rel="stylesheet" type="text/css" href="../static/styles.css" media="screen"/>
+</head>
+<body>
+
+	<header>
+		<div class="container">
+			<a href='/'><button class="btn_result"><i class="fa fa-home"></i> Home</button></a>
+		<div id="brandname" style="margin-left: 130px;">
+			BioTMPy <br/>
+			<span class="otsize">Rank your Biomedical Documents using a Deep Learning Model</span>
+		</div>
+
+	</div>
+	</header> <br/>
+
+
+
+
+	{% if e == 1%}
+	<h2 style="color:rgb(0, 0, 0);">Invalid PubMed IDs.</h2>
+	{% elif e == 2%}
+	<h2 style="color:rgb(0, 0, 0);">Error Searching the Inserted Term.</h2>
+	{% elif e == 3%}
+	<h2 style="color:rgb(0, 0, 0);">Error Loading the Inserted Files.</h2>
+	{% elif e == 4%}
+	<h2 style="color:rgb(0, 0, 0);">Error Processing Your Documents.</h2>
+	{% endif %}
+
+
+
+
+</body>
+</html>
