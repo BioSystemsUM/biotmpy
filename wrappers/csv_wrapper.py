@@ -4,7 +4,6 @@ from data_structures.sentence import Sentence
 from data_structures.token import Token
 from data_structures.relevance import Relevance
 import nltk
-import pandas as pd
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')
@@ -13,7 +12,7 @@ import string
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 
-def csv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False, stems=False, dl_config=None, sep=','):
+def csv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False, stems=False, dl_config=None):
     if dl_config:
         stop_words = dl_config.stop_words
         lower = dl_config.lower
@@ -22,18 +21,19 @@ def csv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, sp
         lemmatization = dl_config.lemmatization
         stems = dl_config.stems
 
-    dataframe = csv_file_reader(file, sep=sep)
+    data_dict = csv_file_reader(file)
     docs = []
-    for i, df_row in dataframe.iterrows():
-        print(i)
-        document = get_document(df_row, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems)
+    for doc_id in data_dict.keys():
+        document = get_document(data_dict[doc_id], doc_id=doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems)
         docs.append(document)
     return docs
 
 
+
+
 def dictionary_to_relevances(file, description):
     try:
-        data_dict = csv_file_reader(file)
+        data_dict = txt_file_reader(file)
         relevances = []
         for doc_id in data_dict.keys():
             relevance = Relevance(data_dict[doc_id]["Label"], doc_id, description)
@@ -44,37 +44,33 @@ def dictionary_to_relevances(file, description):
         return relevances
 
 
-def csv_file_reader(file, sep=','):
-    dataframe = pd.read_csv(file, sep=sep)
-    return standardize_headers(dataframe)
-    
-
-def standardize_headers(dataframe):
-    dataframe.columns = dataframe.columns.str.lower()
-    return dataframe
+def csv_file_reader(file):
+    with open(file, 'r') as fp:
+        text = fp.readlines()
+    return text
 
 
-def get_document(df_row, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems):
+def get_document(text_dict, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems):
     sentences = []
-    if df_row['title'] != '':
-        sentences.extend(get_sentences_dictionary(df_row['title'], passage_type = 't', 
-                                        doc_id=df_row['pmid'], stop_words=stop_words,
+    if text_dict['Title'] != '':
+        sentences.extend(get_sentences_dictionary(text_dict['Title'], passage_type = 't', 
+                                        doc_id=doc_id, stop_words=stop_words,
                                         lower=lower,
                                         remove_punctuation=remove_punctuation, 
                                         split_by_hyphen=split_by_hyphen,
                                         lemmatization=lemmatization,
                                         stems=stems))
-    if df_row['abstract'] != '':
-        sentences.extend(get_sentences_dictionary(df_row['abstract'], passage_type = 'a', 
-                                        doc_id=df_row['pmid'], stop_words=stop_words,
+    if text_dict['Abstract'] != '':
+        sentences.extend(get_sentences_dictionary(text_dict['Abstract'], passage_type = 'a', 
+                                        doc_id=doc_id, stop_words=stop_words,
                                         lower=lower,
                                         remove_punctuation=remove_punctuation, 
                                         split_by_hyphen=split_by_hyphen,
                                         lemmatization=lemmatization,
                                         stems=stems))
     document = Document(sentences=sentences)
-    document.raw_title = df_row['title']
-    document.raw_abstract = df_row['abstract']
+    document.raw_title = text_dict['Title']
+    document.raw_abstract = text_dict['Abstract']
 
     return document
 
@@ -144,7 +140,3 @@ def get_tokens_dictionary(text, passage_type, doc_id, stop_words,
             token = Token(t, passage_type, doc_id = doc_id)
             tokens.append(token)
     return tokens
-
-if __name__=='__main__':
-    import sys
-    sys.append('../')
