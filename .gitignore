@@ -1,6 +1,9 @@
 tests/
 web/best_model/biobert_lstm_ft_28/model_weights.h5
 web/best_model/biobert_v1.1_pubmed/pytorch_model.bin
+datasets/cancer.tsv
+datasets/not_cancer.tsv
+dataset/gastric_cancer.tsv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
