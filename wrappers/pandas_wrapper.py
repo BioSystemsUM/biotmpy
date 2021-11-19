@@ -18,9 +18,8 @@ def docs_to_pandastokens(docs):
 
 
 def docs_to_pandasdocs(docs):
-    dataframe = pandas.DataFrame(docs, columns = ['Document'])
-    indexes = indexing_series_docs(dataframe)
-    dataframe = pandas.DataFrame(data = dataframe.values, index = indexes, columns = list(dataframe.columns))
+    indexes = get_doc_ids(docs)
+    dataframe = pandas.DataFrame(data = docs, index = indexes, columns = ['Document'])
     return dataframe
 
 
@@ -33,15 +32,19 @@ def annot_to_pandas(dataframe, annotations):
     return dataframe
 
 
-def relevances_to_pandas(dataframe, relevances):
-    indexes = list(dataframe.index.values)
+def relevances_to_pandas(dataframe, relevances, merge=True):
+    indexes = []
     labels = []
     for r in relevances:
-        if r.label == 'no':
+        indexes.append(r.id)
+        if r.label == 'no' or r.label == 0 or r.label == 'non-relevant':
             labels.append(0)
-        elif r.label == 'yes':
+        elif r.label == 'yes' or r.label == 1 or r.label == 'relevant':
             labels.append(1)
-    return pandas.Series(labels, index = indexes, name='Label')
+    relevances_df = pandas.DataFrame(data={'Label':labels}, index = indexes)
+    if merge:
+        return pandas.merge(dataframe, relevances_df, left_index=True, right_index=True) 
+    else: return relevances_df
 
 
 def pandastokens_to_docs(dataframe):
@@ -122,14 +125,10 @@ def indexing_series_tokens(dataframe):
     return indexes
 
 
-def indexing_series_docs(dataframe):
-    docs = list(dataframe['Document'])
+def get_doc_ids(docs):
     indexes = []
-    ind = ''
     for d in docs:
-        ind += d.id
-        indexes.append(ind)
-        ind = ''
+        indexes.append(d.id)
     return indexes
 
 

@@ -28,10 +28,7 @@ def dictionary_to_docs(file, stop_words=None, lower=False, remove_punctuation=Fa
         docs.append(document)
     return docs
 
-
-
-
-def dictionary_to_relevances(file, description):
+def dictionary_to_relevances(file, description=None):
     try:
         data_dict = txt_file_reader(file)
         relevances = []
@@ -52,16 +49,16 @@ def txt_file_reader(file):
 
 def get_document(text_dict, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems):
     sentences = []
-    if text_dict['Title'] != '':
-        sentences.extend(get_sentences_dictionary(text_dict['Title'], passage_type = 't', 
+    if text_dict['title'] != '':
+        sentences.extend(get_sentences_dictionary(text_dict['title'], passage_type = 't', 
                                         doc_id=doc_id, stop_words=stop_words,
                                         lower=lower,
                                         remove_punctuation=remove_punctuation, 
                                         split_by_hyphen=split_by_hyphen,
                                         lemmatization=lemmatization,
                                         stems=stems))
-    if text_dict['Abstract'] != '':
-        sentences.extend(get_sentences_dictionary(text_dict['Abstract'], passage_type = 'a', 
+    if text_dict['abstract'] != '':
+        sentences.extend(get_sentences_dictionary(text_dict['abstract'], passage_type = 'a', 
                                         doc_id=doc_id, stop_words=stop_words,
                                         lower=lower,
                                         remove_punctuation=remove_punctuation, 
@@ -69,8 +66,8 @@ def get_document(text_dict, doc_id, stop_words, lower, remove_punctuation, split
                                         lemmatization=lemmatization,
                                         stems=stems))
     document = Document(sentences=sentences)
-    document.raw_title = text_dict['Title']
-    document.raw_abstract = text_dict['Abstract']
+    document.raw_title = text_dict['title']
+    document.raw_abstract = text_dict['abstract']
 
     return document
 

@@ -2,7 +2,7 @@
 
 class Relevance:
     
-    def __init__(self, label, doc_id, description, conf_score=None):
+    def __init__(self, label, doc_id, description=None, conf_score=None):
         self.label = label
         self.id = doc_id
         self.description = description

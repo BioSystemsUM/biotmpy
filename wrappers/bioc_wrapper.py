@@ -82,7 +82,7 @@ def bioc_to_annots_tokens(file):
     else:
         return annots
 
-def bioc_to_relevances(file, description):
+def bioc_to_relevances(file, description=None):
     try:
         collection = bioc_file_reader(file)
         relevances = []

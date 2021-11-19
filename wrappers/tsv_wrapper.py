@@ -13,7 +13,7 @@ import string
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 
-def csv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False, stems=False, dl_config=None, sep=','):
+def tsv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False, stems=False, dl_config=None, sep='\t'):
     if dl_config:
         stop_words = dl_config.stop_words
         lower = dl_config.lower
@@ -22,21 +22,20 @@ def csv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, sp
         lemmatization = dl_config.lemmatization
         stems = dl_config.stems
 
-    dataframe = csv_file_reader(file, sep=sep)
+    dataframe = tsv_file_reader(file, sep=sep)
     docs = []
     for i, df_row in dataframe.iterrows():
-        print(i)
         document = get_document(df_row, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems)
         docs.append(document)
     return docs
 
 
-def dictionary_to_relevances(file, description):
+def tsv_to_relevances(file, sep='\t', description=None):
     try:
-        data_dict = csv_file_reader(file)
+        dataframe = tsv_file_reader(file)
         relevances = []
-        for doc_id in data_dict.keys():
-            relevance = Relevance(data_dict[doc_id]["Label"], doc_id, description)
+        for i, df_row in dataframe.iterrows():
+            relevance = Relevance(df_row["label"], df_row['pmid'], description)
             relevances.append(relevance)
     except:
         print('ERROR: Your file %s does not contain documents with an associated relevance.' % file)
@@ -44,7 +43,7 @@ def dictionary_to_relevances(file, description):
         return relevances
 
 
-def csv_file_reader(file, sep=','):
+def tsv_file_reader(file, sep='\t'):
     dataframe = pd.read_csv(file, sep=sep)
     return standardize_headers(dataframe)
     
