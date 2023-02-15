@@ -17,4 +17,4 @@ RUN python -c "import flask"
 Expose 5000
 
 # The code to run when container is started:
-ENTRYPOINT ["conda", "run", "-n", "biotmpygpu", "python", "web/app.py"]
+ENTRYPOINT ["conda", "run", "-n", "biotmpygpu", "python", "web_app/app.py"]

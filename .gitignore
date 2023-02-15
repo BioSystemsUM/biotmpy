@@ -1,11 +1,11 @@
 tests/
-web/best_model/biobert_lstm_ft_28/model_weights.h5
-web/best_model/biobert_v1.1_pubmed/pytorch_model.bin
-datasets/cancer.tsv
-datasets/not_cancer.tsv
-datasets/gastric_cancer.tsv
-pipelines/models/*
-pipelines/pretrained_models/*
+web_app/best_model/biobert_lstm_ft_28/model_weights.h5
+web_app/best_model/biobert_v1.1_pubmed/pytorch_model.bin
+data/cancer.tsv
+data/not_cancer.tsv
+data/gastric_cancer.tsv
+examples_pipelines/models/*
+examples_pipelines/pretrained_models/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

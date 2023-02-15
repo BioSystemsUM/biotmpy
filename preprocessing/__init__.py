@@ -1,1 +1,0 @@
-from . import term_lists
