@@ -20,7 +20,7 @@ from nltk.stem import WordNetLemmatizer, PorterStemmer
 def bioc_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True,
                  lemmatization=False, stems=False, dl_config=None):
     """
-    Converts a bioc file to a list of documents
+    Converts a bioc file to a list of Document objects with the following structure: Document -> Sentence -> Token.
 
     :param file: path to the bioc file
     :param stop_words: list of stop words. For more details see https://www.nltk.org/book/ch02.html

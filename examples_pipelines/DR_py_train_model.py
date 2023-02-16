@@ -21,7 +21,7 @@ X_train = deserialize_features('../tests/features/all_training_features.txt').dr
 
 y_train = relevances_to_pandas(X_train, relevances_train)
 
-path = 'models/default_svm_model_scaler_proba.txt'
+path = 'results/models/default_svm_model_scaler_proba.txt'
 clf = SVC(probability=True)
 scaler = StandardScaler()
 feature_selector = SelectPercentile(f_classif, percentile = 0.8)

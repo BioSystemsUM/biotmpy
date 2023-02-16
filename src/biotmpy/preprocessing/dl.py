@@ -1,4 +1,6 @@
 
+
+# Imports
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -16,65 +18,98 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
 
+
 def train_val_split(x_train, y_train, validation_percentage=25, seed_value = None, abstract_set=None, model=None):
+    """
+    Splits the training set (x_train and y_train) into a training and validation sets. The validation set is used to evaluate the model during training.
+
+    :param x_train: training set
+    :param y_train: training set labels
+    :param validation_percentage: percentage of the training set to be used as validation set. Default is 25%.
+    :param seed_value: seed value for the random number generator. Default is None.
+    :param abstract_set: set of abstracts. Default is None.
+    :param model: model to be used. Default is None.
+
+    :return: shorter_x_train, shorter_y_train, x_val, y_val
+    """
     if model == 'bert':
-        validation_samples = int(x_train[0].shape[0] * (validation_percentage/100))
-        training_samples = int(x_train[0].shape[0] - validation_samples)
+        return train_val_split_bert(x_train, y_train, validation_percentage, seed_value, abstract_set, model)
+
     else:
         validation_samples = int(x_train.shape[0] * (validation_percentage/100))
         training_samples = int(x_train.shape[0] - validation_samples)
 
+        if seed_value:
+            np.random.seed(seed_value)
+
+        indices = np.arange(x_train.shape[0])
+
+        np.random.shuffle(indices)
+
+        x_train = x_train[indices]
+
+        y_train = y_train[indices]
+
+        shorter_x_train = x_train[:training_samples]
+        shorter_y_train = y_train[:training_samples]
+        
+        x_val = x_train[training_samples: training_samples + validation_samples]
+        y_val = y_train[training_samples: training_samples + validation_samples]
+
+        return shorter_x_train, shorter_y_train, x_val, y_val
+
+
+def train_val_split_bert(x_train, y_train, validation_percentage=25, seed_value=None, abstract_set=None,
+                         model=None):
+    """
+    Splits the training set (x_train and y_train) into a training and validation sets. The validation set is used to evaluate the model during training. This function is used for BERT models. BERT models require a different input format than other models.
+
+    :param x_train: training set
+    :param y_train: training set labels
+    :param validation_percentage: percentage of the training set to be used as validation set. Default is 25%.
+    :param seed_value: seed value for the random number generator. Default is None.
+    :param abstract_set: set of abstracts. Default is None.
+    :param model: model to be used. Default is None.
+
+    :return: shorter_x_train, shorter_y_train, x_val, y_val
+    """
+    validation_samples = int(x_train[0].shape[0] * (validation_percentage/100))
+    training_samples = int(x_train[0].shape[0] - validation_samples)
+
     if seed_value:
         np.random.seed(seed_value)
 
-    if model=='bert':
-        indices = np.arange(x_train[0].shape[0])
-    else:
-        indices = np.arange(x_train.shape[0])
+    indices = np.arange(x_train.shape[0])
 
     np.random.shuffle(indices)
 
-    if model == 'bert':
-        for i_array in range(len(x_train)):
-            x_train[i_array] = x_train[i_array][indices]
-    else:
-        x_train = x_train[indices]
-
+    for i_array in range(len(x_train)):
+        x_train[i_array] = x_train[i_array][indices]
+        
     y_train = y_train[indices]
 
-    if model == 'DeepDTA':
-        abstract_set = abstract_set[indices]
-
-    if model == 'bert':
-        shorter_x_train = []
-        for i_array in range(len(x_train)):
-            shorter_x_train.append(x_train[i_array][:training_samples])
-
-    else:
-        shorter_x_train = x_train[:training_samples]
+    shorter_x_train = []
+    for i_array in range(len(x_train)):
+        shorter_x_train.append(x_train[i_array][:training_samples])    
 
     shorter_y_train = y_train[:training_samples]
 
-    if model == 'DeepDTA':
-        shorter_abstract_set = abstract_set[:training_samples]
+    x_val = []
+    for i_array in range(len(x_train)):
+        x_val.append(x_train[i_array][training_samples: training_samples + validation_samples])
 
-    if model == 'bert':
-        x_val = []
-        for i_array in range(len(x_train)):
-            x_val.append(x_train[i_array][training_samples: training_samples + validation_samples])
-    else:
-        x_val = x_train[training_samples: training_samples + validation_samples]
-    
     y_val = y_train[training_samples: training_samples + validation_samples]
     
-    if model == 'DeepDTA':
-        x_val_abstract = abstract_set[training_samples: training_samples + validation_samples]
-    if model == 'DeepDTA':
-        return shorter_x_train, shorter_abstract_set, shorter_y_train, x_val, x_val_abstract, y_val
-    else:
-        return shorter_x_train, shorter_y_train, x_val, y_val
+    return shorter_x_train, shorter_y_train, x_val, y_val
+def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=None, seed_value=None):    #model only needed for DeepDTA (model='DeepDTA')
+    """
+    Preprocesses the data for deep learning models.
 
-def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=None, seed_value=None, model=None):    #model only needed for DeepDTA (model='DeepDTA')
+    :param x_set: set of documents
+    :param y_set: set of labels
+    :param dl_config: configuration for deep learning models
+    :param dataset: dataset to be used. Can be 'train' or 'test'.
+    """
     padding = dl_config.padding
     truncating = dl_config.truncating
     oov_token = dl_config.oov_token
@@ -86,9 +121,9 @@ def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=Non
     docs = list(x_set['Document'])
     for doc in docs:
         texts.append(doc.fulltext_string)
-        if model == 'DeepDTA':
-            title_texts.append(doc.title_string)
-            abstract_texts.append(doc.abstract_string)
+        # if model == 'DeepDTA':
+        #     title_texts.append(doc.title_string)
+        #     abstract_texts.append(doc.abstract_string)
 
 
     if dataset == 'train':

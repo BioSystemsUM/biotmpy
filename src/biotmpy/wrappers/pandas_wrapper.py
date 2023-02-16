@@ -95,16 +95,27 @@ def pandas_to_sentences(dataframe):
 
 
 def pandas_to_tokens(dataframe):
+    """
+    Converts a pandas DataFrame to a list of Token objects.
+
+    :param dataframe: pandas DataFrame
+
+    :return: list of Token objects
+    """
     tokens = indexes_to_tokens(dataframe)
     return sort_list(tokens)
 
 
-def sort_list(l):
-    l.sort()
-    return l
 
 
 def indexing_series_tokens(dataframe):
+    """
+    Indexes a pandas Series of Token objects.
+
+    :param dataframe: pandas DataFrame
+
+    :return: list of indexes
+    """
     tokens = list(dataframe['Token'])
     indexes = []
     ind = ''
@@ -117,6 +128,13 @@ def indexing_series_tokens(dataframe):
 
 
 def get_doc_ids(docs):
+    """
+    Gets the Document IDs from a list of Document objects.
+
+    :param docs: list of Document objects
+
+    :return: list of Document IDs
+    """
     indexes = []
     for d in docs:
         indexes.append(d.id)
@@ -124,6 +142,13 @@ def get_doc_ids(docs):
 
 
 def indexes_to_tokens(dataframe):
+    """
+    Converts a pandas DataFrame to a list of Token objects.
+
+    :param dataframe: pandas DataFrame
+
+    :return: list of Token objects
+    """
     indexes = list(dataframe.index.values)
     tokens = []
     for ind in indexes:
@@ -131,54 +156,57 @@ def indexes_to_tokens(dataframe):
         tokens.append(Token(tok[0], tok[3], int(tok[1]), int(tok[2]), int(tok[4]), tok[5]))
     return tokens
 
-
-def indexes_to_annots(dataframe):
-    indexes = list(dataframe.index.values)
-    labels = list(dataframe['Label'])
-    annots = []
-    for i in range(len(indexes)):
-        tok = indexes[i].split(' ')
-        annots.append(Annotation(tok[0], tok[3], int(tok[1]), int(tok[2]), labels[i], tok[5]))
-    return annots
-
-
-def docs_to_pandastokens(docs):
-    tokens = []
-    for d in docs:
-        for s in d.sentences:
-            tokens += s.tokens
-    dataframe = pandas.DataFrame(tokens, columns=['Token'])
-    indexes = indexing_series_tokens(dataframe)
-    dataframe = pandas.DataFrame(data=dataframe.values, index=indexes, columns=list(dataframe.columns))
-    return dataframe
+# def docs_to_pandastokens(docs):
+#     tokens = []
+#     for d in docs:
+#         for s in d.sentences:
+#             tokens += s.tokens
+#     dataframe = pandas.DataFrame(tokens, columns=['Token'])
+#     indexes = indexing_series_tokens(dataframe)
+#     dataframe = pandas.DataFrame(data=dataframe.values, index=indexes, columns=list(dataframe.columns))
+#     return dataframe
 
 
-def annot_to_pandas(dataframe, annotations):
-    indexes = list(dataframe.index.values)
-    labels = []
-    for a in annotations:
-        labels.append(a.label)
-    dataframe['Label'] = pandas.Series(labels, index=indexes)
-    return dataframe
+# def annot_to_pandas(dataframe, annotations):
+#     indexes = list(dataframe.index.values)
+#     labels = []
+#     for a in annotations:
+#         labels.append(a.label)
+#     dataframe['Label'] = pandas.Series(labels, index=indexes)
+#     return dataframe
 
+#
+# def pandastokens_to_docs(dataframe):
+#     sentences = pandas_to_sentences(dataframe)
+#     doc_sentences, docs = [], []
+#     d_id = -1
+#     for s in sentences:
+#         s_doc_id = s.getDocId()
+#         if s_doc_id != d_id:
+#             d_id = s_doc_id
+#             if doc_sentences:
+#                 docs.append(Document(doc_sentences))
+#             doc_sentences = []
+#         doc_sentences.append(s)
+#     if doc_sentences:
+#         docs.append(Document(doc_sentences))
+#     return docs
 
-def pandas_to_annot(dataframe):
-    annots = indexes_to_annots(dataframe)
-    return sort_list(annots)
+# def indexes_to_annots(dataframe):
+#     """
+#     Converts a pandas DataFrame to a list of Annotation objects.
+#
+#
+#     """
+#     indexes = list(dataframe.index.values)
+#     labels = list(dataframe['Label'])
+#     annots = []
+#     for i in range(len(indexes)):
+#         tok = indexes[i].split(' ')
+#         annots.append(Annotation(tok[0], tok[3], int(tok[1]), int(tok[2]), labels[i], tok[5]))
+#     return annots
 
+# def pandas_to_annot(dataframe):
+#     annots = indexes_to_annots(dataframe)
+#     return sort_list(annots)
 
-def pandastokens_to_docs(dataframe):
-    sentences = pandas_to_sentences(dataframe)
-    doc_sentences, docs = [], []
-    d_id = -1
-    for s in sentences:
-        s_doc_id = s.getDocId()
-        if s_doc_id != d_id:
-            d_id = s_doc_id
-            if doc_sentences:
-                docs.append(Document(doc_sentences))
-            doc_sentences = []
-        doc_sentences.append(s)
-    if doc_sentences:
-        docs.append(Document(doc_sentences))
-    return docs

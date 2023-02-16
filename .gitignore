@@ -4,7 +4,7 @@ web_app/best_model/biobert_v1.1_pubmed/pytorch_model.bin
 data/cancer.tsv
 data/not_cancer.tsv
 data/gastric_cancer.tsv
-examples_pipelines/models/*
+examples_pipelines/results/models/*
 examples_pipelines/pretrained_models/*
 
 # Byte-compiled / optimized / DLL files

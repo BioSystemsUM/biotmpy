@@ -30,6 +30,16 @@ from yellowbrick.style.palettes import color_palette
 
 
 def analysis_dataframe(x_train, y_train, dataset_name, set=None):
+    """
+    Creates a dataframe with the fulltext, word count and number of sentences of each document in the corpus. This dataframe is used for data analysis.
+
+    :param x_train: list of Document objects
+    :param y_train: list of Relevance objects
+    :param dataset_name: name of the dataset
+    :param set: set of the dataset (train, test, validation)
+
+    :return: dataframe with the fulltext, word count and number of sentences of each document in the corpus
+    """
     data = {'Document': x_train["Document"], 'fulltext':[], 'word_count':[], 'nmr_sentences':[], 'Label':[]}
     for doc in x_train["Document"]:
         data['fulltext'].append(doc.fulltext_string)
@@ -49,6 +59,19 @@ def analysis_dataframe(x_train, y_train, dataset_name, set=None):
 
 
 def corpus_visualization(analysis_df, dim_red='tsne', feature_ext='tfidf', file_name = None, title=None, decompose_byint=50, random_state=None):
+    """
+    Creates a visualization of the corpus using the t-SNE or UMAP dimensionality reduction technique and the TF-IDF or Bag of Words feature extraction technique.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus
+    :param dim_red: dimensionality reduction technique (t-SNE or UMAP)
+    :param feature_ext: feature extraction technique (TF-IDF or Bag of Words)
+    :param file_name: name of the file to save the plot
+    :param title: title of the plot
+    :param decompose_byint: number of components to decompose the data
+    :param random_state: random state for the dimensionality reduction technique
+
+    :return: visualization of the corpus
+    """
     name = analysis_df.name
     if title is None:
         if 'train' in name:
@@ -91,6 +114,19 @@ def corpus_visualization(analysis_df, dim_red='tsne', feature_ext='tfidf', file_
 
 
 def plot_nmr_sentences(analysis_df, bins= 100, xTitle = 'Number of Sentences', yTitle = 'Count', title='Text Length Distribution' , filename='text_len', fig_dim=(16,5)):
+    """
+    Creates a plot of the distribution of the number of sentences per document in the corpus.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    :param bins: number of bins for the histogram. Default is 100
+    :param xTitle: title of the x-axis. Default is 'Number of Sentences'
+    :param yTitle: title of the y-axis. Default is 'Count'
+    :param title: title of the plot. Default is 'Text Length Distribution'
+    :param filename: name of the file to save the plot. Default is 'text_len'
+    :param fig_dim: dimensions of the plot. Default is (16,5)
+
+    :return: plot of the distribution of the number of sentences per document in the corpus
+    """
     fig, (ax1, ax2) = plt.subplots(1,2, figsize=fig_dim)
     fig.tight_layout()
     ax1.hist(analysis_df['nmr_sentences'], bins=bins)
@@ -108,6 +144,21 @@ def plot_nmr_sentences(analysis_df, bins= 100, xTitle = 'Number of Sentences', y
 
 
 def plot_word_count(analysis_df, bins= 100, xTitle = 'Number of words per Document', yTitle = 'Number of documents', title='Word Count Distribution', filename = 'word_count', fig_dim=(16,5), y_lim=None, file_extension=None):
+    """
+    Creates a plot of the distribution of the number of words per document in the corpus.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus
+    :param bins: number of bins for the histogram. Default: 100
+    :param xTitle: title of the x-axis. Default: 'Number of words per Document'
+    :param yTitle: title of the y-axis. Default: 'Number of documents'
+    :param title: title of the plot. Default: 'Word Count Distribution'
+    :param filename: name of the file to save the plot. Default: 'word_count'
+    :param fig_dim: dimensions of the plot. Default: (16,5)
+    :param y_lim: limits of the y-axis. Default: None
+    :param file_extension: extension of the file to save the plot. Default: None
+
+    :return: plot of the distribution of the number of words per document in the corpus
+    """
     fig, (ax1, ax2) = plt.subplots(1,2, figsize=fig_dim)
     fig.tight_layout()
     ax1.hist(analysis_df['word_count'], bins=bins)
@@ -131,6 +182,19 @@ def plot_word_count(analysis_df, bins= 100, xTitle = 'Number of words per Docume
 
 
 def plot_words_per_sentence(analysis_df, bins= 100, xTitle = 'Number of Words per Sentence', yTitle = 'Count', title='Text Length Distribution' , filename='text_len', threshold=None):
+    """
+    Creates a plot of the distribution of the number of words per sentence in the corpus.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    :param bins: number of bins for the histogram. Default is 100
+    :param xTitle: title of the x-axis. Default is 'Number of Words per Sentence'
+    :param yTitle: title of the y-axis. Default is 'Count'
+    :param title: title of the plot. Default is 'Text Length Distribution'
+    :param filename: name of the file to save the plot. Default is 'text_len'
+    :param threshold: if set, only sentences with a number of words equal or higher than the threshold will be considered. Default is None
+
+    :return: plot of the distribution of the number of words per sentence in the corpus
+    """
     nmr_words_sentence = []
     nmr_sentences_threshold = 0
     nmr_sentences = 0
@@ -155,6 +219,14 @@ def plot_words_per_sentence(analysis_df, bins= 100, xTitle = 'Number of Words pe
 
 
 def plot_labels_balance(analysis_df, filename='labels_balance'):
+    """
+    Creates a pie chart of the labels balance in the corpus.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    :param filename: name of the file to save the plot. Default is 'labels_balance'
+
+    :return: pie chart of the labels balance in the corpus
+    """
     d = {'relevant':[], 'non-relevant':[]}
     d['relevant']= analysis_df.loc[analysis_df['Label']=='relevant',].shape[0]
     d['non-relevant'] = analysis_df.loc[analysis_df['Label'] == 'non-relevant',].shape[0]
@@ -166,6 +238,20 @@ def plot_labels_balance(analysis_df, filename='labels_balance'):
 
 
 def plot_top_n_words(analysis_df, n=20, stop_words = None, file_name = 'top_words', n_grams = 1, yTitle = 'Count', title='Top 20 Words', fig_dim=(16,6)):
+    """
+    Creates a plot of the top n words in the corpus.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    :param n: number of top words to plot. Default is 20
+    :param stop_words: list of stop words to be removed from the corpus. Default is None
+    :param file_name: name of the file to save the plot. Default is 'top_words'
+    :param n_grams: number of words to be considered as a single word. Default is 1
+    :param yTitle: title of the y-axis. Default is 'Count'
+    :param title: title of the plot. Default is 'Top 20 Words'
+    :param fig_dim: dimensions of the figure. Default is (16,6)
+
+    :return: plot of the top n words in the corpus
+    """
     name = analysis_df.name
     data = {}
     for lab in analysis_df['Label'].unique():
@@ -213,6 +299,14 @@ def plot_top_n_words(analysis_df, n=20, stop_words = None, file_name = 'top_word
 
 
 def LSA_topic_modelling(analysis_df, n_topics = 6):
+    """
+    Performs topic modelling using Latent Semantic Analysis.
+
+    :param analysis_df: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    :param n_topics: number of topics to be extracted. Default is 6
+
+    :return: dataframe with the fulltext, word count and number of sentences of each document in the corpus.
+    """
     reindexed_data = analysis_df['fulltext']
     tfidf_vectorizer = TfidfVectorizer(min_df=3, stop_words=set(stopwords.words('english')), 
                                         ngram_range=(1,3), analyzer="word")  #, use_idf=True, smooth_idf=True)
@@ -267,6 +361,16 @@ def LSA_topic_modelling(analysis_df, n_topics = 6):
     show(plot)
 
 def get_top_n_words(corpus, n=None, stop_words=None, n_grams=1):
+    """
+    List the top n words in a vocabulary according to occurrence in a text corpus.
+
+    :param corpus: list of documents
+    :param n: number of words to return. Default is None
+    :param stop_words: list of stop words to be removed. Default is None
+    :param n_grams: number of words to be considered in each n-gram. Default is 1
+
+    :return: dataframe with the top n words and their frequency
+    """
     vec = CountVectorizer(stop_words=stop_words, ngram_range=(n_grams, n_grams)).fit(corpus)
     bag_of_words = vec.transform(corpus)
     sum_words = bag_of_words.sum(axis=0)
@@ -278,28 +382,41 @@ def get_top_n_words(corpus, n=None, stop_words=None, n_grams=1):
     return df
 
 def get_keys(topic_matrix):
-    '''
-    returns an integer list of predicted topic
-    categories for a given topic matrix
-    '''
+    """
+    returns a list of keys for a given topic matrix
+
+    :param topic_matrix: matrix of topics
+
+    :return: list of keys
+    """
     keys = topic_matrix.argmax(axis=1).tolist()
     return keys
 
 def keys_to_counts(keys):
-    '''
-    returns a tuple of topic categories and their
-    accompanying magnitudes for a given list of keys
-    '''
+    """
+    returns a tuple of categories and counts for a given list of keys
+
+    :param keys: list of keys
+
+    :return: tuple of categories and counts
+    """
     count_pairs = Counter(keys).items()
     categories = [pair[0] for pair in count_pairs]
     counts = [pair[1] for pair in count_pairs]
     return (categories, counts)
 
 def get_top_n_words_2(n, keys, document_term_matrix, tfidf_vectorizer, n_topics):
-    '''
-    returns a list of n_topic strings, where each string contains the n most common
-    words in a predicted category, in order
-    '''
+    """
+    returns a list of the top n words for each topic
+
+    :param n: number of words to return
+    :param keys: list of keys
+    :param document_term_matrix: document term matrix
+    :param tfidf_vectorizer: tfidf vectorizer
+    :param n_topics: number of topics
+
+    :return: list of top n words for each topic
+    """
     top_word_indices = []
     for topic in range(n_topics):
         temp_vector_sum = 0
@@ -322,9 +439,15 @@ def get_top_n_words_2(n, keys, document_term_matrix, tfidf_vectorizer, n_topics)
 
 
 def get_mean_topic_vectors(keys, two_dim_vectors, n_topics):
-    '''
-    returns a list of centroid vectors from each predicted topic category
-    '''
+    """
+    returns a list of mean topic vectors
+
+    :param keys: list of keys
+    :param two_dim_vectors: list of two dimensional vectors
+    :param n_topics: number of topics
+
+    :return: list of mean topic vectors
+    """
     mean_topic_vectors = []
     for t in range(n_topics):
         reviews_in_that_topic = []
