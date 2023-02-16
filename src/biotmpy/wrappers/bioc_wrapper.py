@@ -3,18 +3,15 @@ from bioc.biocxml.encoder import dump
 from bioc import BioCCollection, BioCDocument, BioCPassage, BioCAnnotation, BioCLocation
 from biotmpy.data_structures import Document
 from biotmpy.data_structures.sentence import Sentence
-from biotmpy.data_structures import Token
-from biotmpy.data_structures.relevance import Relevance
-import nltk
 
-from wrappers_utils import get_tokens
+from biotmpy.data_structures.relevance import Relevance
+
+from wrappers_utils import *
 
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')
-import re
-import string
-from nltk.stem import WordNetLemmatizer, PorterStemmer
+
 
 
 def bioc_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True,
@@ -98,7 +95,7 @@ def bioc_to_relevances(file, topic=None):
             relevance = Relevance(d.infons["relevant"], d.id, topic)
             relevances.append(relevance)
     except:
-        print('ERROR: Your file %s does not contain documents with an associated relevance.' % file)
+        raise ValueError('Your file %s does not contain documents with an associated relevance.' % file)
     else:
         return relevances
 
@@ -128,19 +125,6 @@ def bioc_file_writer(file, collection):
 
     with open(file, 'w') as fp:
         dump(collection, fp)
-
-
-def txt_file_reader(file):
-    """
-    Reads a txt file
-
-    :param file: path to the txt file
-
-    :return: list of strings, each string is a line of the txt file
-    """
-    with open(file, 'r') as fp:
-        text = fp.readlines()
-    return text
 
 
 def get_document_bioc(biocdoc, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems):
@@ -212,8 +196,6 @@ def get_sentences_bioc(biocdoc, stop_words, lower, remove_punctuation, split_by_
         sentences.append(sentence)
         offset += len(s) + 1
     return sentences, raw_title, raw_abstract
-
-
 
 # def get_annotations_tokens(biocdoc):
 #     sentences = get_sentences(biocdoc)

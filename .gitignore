@@ -6,6 +6,8 @@ data/gastric_cancer.tsv
 examples_pipelines/results/models/*
 examples_pipelines/pretrained_models/*
 
+biotmpy-env/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -13,6 +15,9 @@ __pycache__/
 
 # C extensions
 *.so
+
+#Vscode
+.vscode
 
 # Pycharm
 .idea

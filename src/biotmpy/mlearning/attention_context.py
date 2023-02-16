@@ -18,6 +18,7 @@ def dot_product(x, kernel):
     else:
         return K.dot(x, kernel)
 
+
 class AttentionWithContext(Layer):
     """
     Attention operation, with a context/query vector, for temporal data.
@@ -43,7 +44,10 @@ class AttentionWithContext(Layer):
                  W_regularizer=None, u_regularizer=None, b_regularizer=None,
                  W_constraint=None, u_constraint=None, b_constraint=None,
                  bias=True, **kwargs):
-        
+
+        self.W = None
+        self.b = None
+        self.u = None
         self.supports_masking = True
         self.init = initializers.get('glorot_uniform')
 
@@ -57,9 +61,13 @@ class AttentionWithContext(Layer):
 
         self.bias = bias
         super(AttentionWithContext, self).__init__(**kwargs)
-        
 
     def get_config(self):
+        """
+        Get config for serialization of model to JSON format
+
+        :return: dict of config parameters for model serialization
+        """
         config = super().get_config().copy()
         config.update({
             'supports_masking': self.supports_masking,
@@ -75,6 +83,13 @@ class AttentionWithContext(Layer):
         return config
 
     def build(self, input_shape):
+        """
+        Build the layer
+
+        :param input_shape: shape of input tensor
+
+        :return: None
+        """
         assert len(input_shape) == 3
 
         self.W = self.add_weight(shape=(input_shape[-1], input_shape[-1],),
@@ -97,8 +112,16 @@ class AttentionWithContext(Layer):
 
         super(AttentionWithContext, self).build(input_shape)
 
+    @staticmethod
+    def compute_mask(input, input_mask=None):
+        """
+        Compute mask for layer
 
-    def compute_mask(self, input, input_mask=None):
+        :param input: input tensor
+        :param input_mask: mask of input tensor
+
+        :return: mask of output tensor
+        """
         # do not pass the mask to the next layers
         return None
 
@@ -127,5 +150,13 @@ class AttentionWithContext(Layer):
         weighted_input = x * a
         return K.sum(weighted_input, axis=1)
 
-    def compute_output_shape(self, input_shape):
+    @staticmethod
+    def compute_output_shape(input_shape):
+        """
+        Compute output shape of layer
+
+        :param input_shape: shape of input tensor
+
+        :return: shape of output tensor
+        """
         return input_shape[0], input_shape[-1]

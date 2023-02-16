@@ -1,7 +1,7 @@
+from keras.layers import Layer
+from keras import initializers
+import keras.backend as K
 
-from tensorflow.keras.layers import Layer
-from tensorflow.keras import initializers
-import tensorflow.keras.backend as K
 
 class AttentionLayer(Layer):
     """
@@ -12,6 +12,11 @@ class AttentionLayer(Layer):
     """
 
     def __init__(self, attention_dim=100, return_coefficients=False, **kwargs):
+        """
+        :param attention_dim: dimension of the attention space
+        :param return_coefficients: if True, the attention coefficients are returned
+        :param kwargs: additional arguments for the Layer class (e.g. name). See Layer documentation for more details.
+        """
         # Initializer
         self.supports_masking = True
         self.return_coefficients = return_coefficients
@@ -19,9 +24,12 @@ class AttentionLayer(Layer):
         self.attention_dim = attention_dim
         super(AttentionLayer, self).__init__(**kwargs)
 
-
-
     def get_config(self):
+        """
+        Returns the config of the layer.
+
+        :return: config of the layer
+        """
         config = super().get_config().copy()
         config.update({
             'supports_masking': self.supports_masking,
@@ -32,6 +40,13 @@ class AttentionLayer(Layer):
         return config
 
     def build(self, input_shape):
+        """
+        Builds the layer.
+
+        :param input_shape: shape of the input
+
+        :return: None
+        """
         # Builds all weights
         # W = Weight matrix, b = bias vector, u = context vector
         assert len(input_shape) == 3
@@ -42,10 +57,19 @@ class AttentionLayer(Layer):
 
         super(AttentionLayer, self).build(input_shape)
 
-    def compute_mask(self, input, input_mask=None):
+    @staticmethod
+    def compute_mask(input, input_mask=None):
         return None
 
     def call(self, hit, mask=None):
+        """
+        Performs the actual computation of the layer.
+
+        :param hit: input tensor
+        :param mask: mask tensor
+
+        :return: output tensor
+        """
         # Here, the actual calculation is done
         uit = K.bias_add(K.dot(hit, self.W), self.b)
         uit = K.tanh(uit)
@@ -67,8 +91,14 @@ class AttentionLayer(Layer):
             return K.sum(weighted_input, axis=1)
 
     def compute_output_shape(self, input_shape):
+        """
+        Computes the output shape of the layer.
+
+        :param input_shape: shape of the input
+
+        :return: shape of the output
+        """
         if self.return_coefficients:
             return [(input_shape[0], input_shape[-1]), (input_shape[0], input_shape[-1], 1)]
         else:
             return input_shape[0], input_shape[-1]
-

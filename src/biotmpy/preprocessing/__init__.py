@@ -1,1 +1,1 @@
-from data import term_lists
+from .dl_config import DLConfig

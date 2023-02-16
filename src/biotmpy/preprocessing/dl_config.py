@@ -93,7 +93,8 @@ class DLConfig:
             with open(self.path, 'wb') as config_path:
                 pickle.dump(self, config_path)
 
-    def load(self, path):
+    @staticmethod
+    def load(path):
         with open(path, 'rb') as config_path:
             return pickle.load(config_path)
 
@@ -137,7 +138,8 @@ class DLConfig:
         with open(self.model_id_path / "config_description.txt", "w") as config_txt:
             config_txt.write(str(data))
 
-    def load_tensorflow_model(self, path):
+    @staticmethod
+    def load_tensorflow_model(path):
         model = load_model(path)
         return model
 
@@ -151,6 +153,7 @@ class DLConfig:
             with open(self.path, 'wb') as data_path:
                 pickle.dump(data, data_path)
 
-    def load_data(self, path):
+    @staticmethod
+    def load_data(path):
         with open(path, 'rb') as data_path:
             return pickle.load(data_path)

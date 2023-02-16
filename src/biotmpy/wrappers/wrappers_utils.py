@@ -1,13 +1,19 @@
+import string
+
 import nltk
+from nltk import WordNetLemmatizer, PorterStemmer
 
 from wrappers_utils import *
 
-def get_document(dict_or_pandas, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization,
-                            stems):
+from biotmpy.data_structures import Document, Sentence, Token
+
+
+def get_document(dict_or_pandas_row, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization,
+                 stems):
     """
     Converts  a dictionary or a pandas row to a Document object with the sentences and tokens. Examples of the structure of both dictionary and pandas can be seen on the data folder.
 
-    :param dict_or_pandas: dictionary or pandas row
+    :param dict_or_pandas_row: dictionary or pandas row
     :param doc_id: document id
     :param stop_words: list of stop words. For more details see https://www.nltk.org/book/ch02.html
     :param lower: boolean, if True, all words are converted to lower case
@@ -19,16 +25,16 @@ def get_document(dict_or_pandas, doc_id, stop_words, lower, remove_punctuation, 
     :return: Document object
     """
     sentences = []
-    if dict_or_pandas['title'] != '':
-        sentences.extend(get_sentences(text_dict['title'], passage_type='t',
+    if dict_or_pandas_row['title'] != '':
+        sentences.extend(get_sentences(dict_or_pandas_row['title'], passage_type='t',
                                        doc_id=doc_id, stop_words=stop_words,
                                        lower=lower,
                                        remove_punctuation=remove_punctuation,
                                        split_by_hyphen=split_by_hyphen,
                                        lemmatization=lemmatization,
                                        stems=stems))
-    if dict_or_pandas['abstract'] != '':
-        sentences.extend(get_sentences(text_dict['abstract'], passage_type='a',
+    if dict_or_pandas_row['abstract'] != '':
+        sentences.extend(get_sentences(dict_or_pandas_row['abstract'], passage_type='a',
                                        doc_id=doc_id, stop_words=stop_words,
                                        lower=lower,
                                        remove_punctuation=remove_punctuation,
@@ -36,11 +42,14 @@ def get_document(dict_or_pandas, doc_id, stop_words, lower, remove_punctuation, 
                                        lemmatization=lemmatization,
                                        stems=stems))
     document = Document(sentences=sentences)
-    document.raw_title = text_dict['title']
-    document.raw_abstract = text_dict['abstract']
+    document.raw_title = dict_or_pandas_row['title']
+    document.raw_abstract = dict_or_pandas_row['abstract']
 
     return document
-def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization, stems):
+
+
+def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuation, split_by_hyphen, lemmatization,
+                  stems):
     """
     Converts text to a list of Sentence objects. Each sentence is a list of Token objects. Each token has a string, a start position, an end position, an offset and a document id.
 
@@ -59,9 +68,9 @@ def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuat
     sent = nltk.sent_tokenize(text)
     sentences = []
     for s in sent:
-        tokens = get_tokens_dictionary(s, passage_type=passage_type, doc_id=doc_id, stop_words=stop_words, lower=lower,
-                                    remove_punctuation=remove_punctuation, split_by_hyphen=split_by_hyphen,
-                                    lemmatization=lemmatization, stems=stems)
+        tokens = get_tokens(s, passage_type=passage_type, doc_id=doc_id, stop_words=stop_words, lower=lower,
+                                       remove_punctuation=remove_punctuation, split_by_hyphen=split_by_hyphen,
+                                       lemmatization=lemmatization, stems=stems)
         s = ''
         for i in range(len(tokens)):
             if i != len(tokens) - 1:
@@ -71,6 +80,7 @@ def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuat
         sentence = Sentence(s, tokens, passage_type=passage_type)
         sentences.append(sentence)
     return
+
 
 def get_tokens(text, doc_id=None, offset=0, passage_type=None, stop_words=None,
                lower=None, remove_punctuation=None, split_by_hyphen=None,
@@ -158,3 +168,16 @@ def sort_list(l):
     """
     l.sort()
     return l
+
+
+def txt_file_reader(file):
+    """
+    Reads a txt file
+
+    :param file: path to the txt file
+
+    :return: list of strings, each string is a line of the txt file
+    """
+    with open(file, 'r') as fp:
+        text = fp.readlines()
+    return text

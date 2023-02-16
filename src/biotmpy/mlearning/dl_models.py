@@ -21,30 +21,6 @@ from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import f1_score, recall_score, precision_score
 
 
-def compile(model, optimizer, lr, dl_config, loss, n_classes):
-    if not optimizer:
-        optimizer = Adam(lr=lr)
-
-    if not loss:
-        if n_classes == 2:
-            model.compile(loss='binary_crossentropy',
-                optimizer=optimizer,
-                metrics=['accuracy'])
-        elif n_classes > 2:
-            model.compile(loss='categorical_crossentropy',
-                optimizer=optimizer,
-                metrics=['accuracy'])
-
-    else:
-        model.compile(loss=loss,
-            optimizer=optimizer,
-            metrics=['accuracy'])
-
-    dl_config.learning_rate = lr
-
-    return model
-
-
 
 
 def Burns_CNNBiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
