@@ -1,7 +1,7 @@
 from keras.optimizers.legacy.adam import Adam
 
 
-def compile(model, optimizer, lr, dl_config, loss, n_classes):
+def compile(model, optimizer, lr, config, loss, n_classes):
     if not optimizer:
         optimizer = Adam(lr=lr)
 
@@ -20,6 +20,6 @@ def compile(model, optimizer, lr, dl_config, loss, n_classes):
                       optimizer=optimizer,
                       metrics=['accuracy'])
 
-    dl_config.learning_rate = lr
+    config.learning_rate = lr
 
     return model

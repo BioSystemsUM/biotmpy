@@ -1,5 +1,4 @@
 
-
 # Imports
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.preprocessing.text import Tokenizer, text_to_word_sequence
@@ -36,7 +35,7 @@ def train_val_split(x_train, y_train, validation_percentage=25, seed_value = Non
         return train_val_split_bert(x_train, y_train, validation_percentage, seed_value, abstract_set, model)
 
     else:
-        validation_samples = int(x_train.shape[0] * (validation_percentage/100))
+        validation_samples = int(x_train.shape[0] * (validation_percentag e /100))
         training_samples = int(x_train.shape[0] - validation_samples)
 
         if seed_value:
@@ -73,7 +72,7 @@ def train_val_split_bert(x_train, y_train, validation_percentage=25, seed_value=
 
     :return: shorter_x_train, shorter_y_train, x_val, y_val
     """
-    validation_samples = int(x_train[0].shape[0] * (validation_percentage/100))
+    validation_samples = int(x_train[0].shape[0] * (validation_percentag e /100))
     training_samples = int(x_train[0].shape[0] - validation_samples)
 
     if seed_value:
@@ -101,20 +100,20 @@ def train_val_split_bert(x_train, y_train, validation_percentage=25, seed_value=
     y_val = y_train[training_samples: training_samples + validation_samples]
     
     return shorter_x_train, shorter_y_train, x_val, y_val
-def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=None, seed_value=None):    #model only needed for DeepDTA (model='DeepDTA')
+def DL_preprocessing(x_set, y_set, config, dataset, validation_percentage=None, seed_value=None):  # model only needed for DeepDTA (model='DeepDTA')
     """
     Preprocesses the data for deep learning models.
 
     :param x_set: set of documents
     :param y_set: set of labels
-    :param dl_config: configuration for deep learning models
+    :param config: configuration for deep learning models
     :param dataset: dataset to be used. Can be 'train' or 'test'.
     """
-    padding = dl_config.padding
-    truncating = dl_config.truncating
-    oov_token = dl_config.oov_token
-    lower = dl_config.lower
-    remove_punctuation = dl_config.remove_punctuation
+    padding = config.padding
+    truncating = config.truncating
+    oov_token = config.oov_token
+    lower = config.lower
+    remove_punctuation = config.remove_punctuation
 
     texts, word_index = [], []
     title_texts, abstract_texts = [], []
@@ -127,14 +126,14 @@ def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=Non
 
 
     if dataset == 'train':
-        dl_config.tokenizer.fit_on_texts(texts)
-        word_index = dl_config.tokenizer.word_index
+        config.tokenizer.fit_on_texts(texts)
+        word_index = config.tokenizer.word_index
         print('Found %s unique tokens.' % len(word_index))
 
-    max_sent_len = dl_config.max_sent_len
+    max_sent_len = config.max_sent_len
 
-    if dl_config.max_nb_sentences:
-        max_nb_sentences = dl_config.max_nb_sentences
+    if config.max_nb_sentences:
+        max_nb_sentences = config.max_nb_sentences
         x_set = np.zeros((len(texts), max_nb_sentences, max_sent_len), dtype='int32')
         for i, doc in enumerate(docs):
             for j, sent in enumerate(doc.sentences):
@@ -143,36 +142,39 @@ def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=Non
                     if not remove_punctuation:
                         wordTokens = text_to_word_sequence(sent.string, lower=lower, filters='')
                     k = 0
-                    pre_truncating_start = len(wordTokens)-max_sent_len
+                    pre_truncating_start = len(wordTokens ) -max_sent_len
                     for id_word, word in enumerate(wordTokens):
                         if truncating == 'pre' and len(wordTokens) > max_sent_len:
                             if id_word < pre_truncating_start:
                                 continue
                         if k < max_sent_len:
-                            if word in dl_config.tokenizer.word_index:
-                                if dl_config.tokenizer.word_index[word] < dl_config.max_nb_words:
-                                    if padding=='pre' and len(wordTokens) < max_sent_len:
-                                        x_set[i, j, k+(max_sent_len - len(wordTokens))] = dl_config.tokenizer.word_index[word]
+                            if word in config.tokenizer.word_index:
+                                if config.tokenizer.word_index[word] < config.max_nb_words:
+                                    if paddin g= ='pre' and len(wordTokens) < max_sent_len:
+                                        x_set[i, j, k+ (max_sent_len - len(wordTokens))] = \
+                                        config.tokenizer.word_index[word]
                                     else:
-                                        x_set[i, j, k] = dl_config.tokenizer.word_index[word]
+                                        x_set[i, j, k] = config.tokenizer.word_index[word]
                                     k = k + 1
                             else:
-                                if padding=='pre'and len(wordTokens) < max_sent_len:
-                                    x_set[i, j, k+(max_sent_len - len(wordTokens))] = dl_config.tokenizer.word_index[str(oov_token)]
+                                if padding == 'pre' and len(wordTokens) < max_sent_len:
+                                    x_set[i, j, k + (max_sent_len - len(wordTokens))] = config.tokenizer.word_index[
+                                        str(oov_token)]
                                 else:
-                                    x_set[i, j, k] = dl_config.tokenizer.word_index[str(oov_token)]
+                                    x_set[i, j, k] = config.tokenizer.word_index[str(oov_token)]
                                 k += 1
         if oov_token:
-            print('Index of Unknown Words:', dl_config.tokenizer.word_index[str(oov_token)])
+            print('Index of Unknown Words:', config.tokenizer.word_index[str(oov_token)])
     else:
 
         if model == 'DeepDTA':
-            title_sequences = dl_config.tokenizer.texts_to_sequences(title_texts)
+            title_sequences = config.tokenizer.texts_to_sequences(title_texts)
             title_set = pad_sequences(title_sequences, maxlen=max_sent_len, padding=padding, truncating=truncating)
-            abstract_sequences = dl_config.tokenizer.texts_to_sequences(abstract_texts)
-            abstract_set = pad_sequences(abstract_sequences, maxlen=max_sent_len, padding=padding, truncating=truncating)
+            abstract_sequences = config.tokenizer.texts_to_sequences(abstract_texts)
+            abstract_set = pad_sequences(abstract_sequences, maxlen=max_sent_len, padding=padding,
+                                         truncating=truncating)
         else:
-            sequences = dl_config.tokenizer.texts_to_sequences(texts)
+            sequences = config.tokenizer.texts_to_sequences(texts)
             x_set = pad_sequences(sequences, maxlen=max_sent_len, padding=padding, truncating=truncating)
 
     y_set = np.asarray(y_set)
@@ -184,18 +186,21 @@ def DL_preprocessing(x_set, y_set, dl_config, dataset, validation_percentage=Non
             return x_set, y_set
     else:
         if model == 'DeepDTA':
-            x_train_title, x_train_abstract, y_train, x_val_title, x_val_abstract, y_val = train_val_split(x_train=title_set, y_train=y_set, validation_percentage=validation_percentage, seed_value=seed_value, abstract_set=abstract_set, model='DeepDTA')
+            x_train_title, x_train_abstract, y_train, x_val_title, x_val_abstract, y_val = train_val_split(
+                x_train=title_set, y_train=y_set, validation_percentage=validation_percentage, seed_value=seed_value,
+                abstract_set=abstract_set, model='DeepDTA')
             return x_train_title, x_train_abstract, y_train, x_val_title, x_val_abstract, y_val
         else:
-            x_train, y_train, x_val, y_val = train_val_split(x_set, y_set, validation_percentage=validation_percentage, seed_value=seed_value)
+            x_train, y_train, x_val, y_val = train_val_split(x_set, y_set, validation_percentage=validation_percentage,
+                                                             seed_value=seed_value)
             print('Training set with {} samples'.format(x_train.shape[0]))
             print('Validation set with {} samples'.format(x_val.shape[0]))
             return x_train, y_train, x_val, y_val
 
 
-def Bert_preprocessing(x_set, y_set=None, dl_config=None, nmr_sentences=1, validation_percentage=None, seed_value=None):
-    padding = dl_config.padding
-    truncating = dl_config.truncating
+def Bert_preprocessing(x_set, y_set=None, config=None, nmr_sentences=1, validation_percentage=None, seed_value=None):
+    padding = config.padding
+    truncating = config.truncating
 
     tokenized_docs = []
     for doc in x_set['Document']:
@@ -206,26 +211,25 @@ def Bert_preprocessing(x_set, y_set=None, dl_config=None, nmr_sentences=1, valid
         else:
             raise ValueError('Bert can only take 1 or 2 sentences')
 
-        tokenized_docs.append(dl_config.tokenizer.tokenize(marked_text))
-        
+        tokenized_docs.append(config.tokenizer.tokenize(marked_text))
 
     indexed_docs = []
     for doc in tokenized_docs:
-        indexed_docs.append(dl_config.tokenizer.convert_tokens_to_ids(doc))
-    
-    max_sent_len = dl_config.max_sent_len
+        indexed_docs.append(config.tokenizer.convert_tokens_to_ids(doc))
+
+    max_sent_len = config.max_sent_len
     indexed_docs = pad_sequences(indexed_docs, maxlen=max_sent_len, padding=padding, truncating=truncating)
 
     segment_ids = []
     masks = []
     for id_doc in range(len(indexed_docs)):
-        if nmr_sentences==1:
+        if nmr_sentences == 1:
             segment_ids.append([0] * len(indexed_docs[0]))
-        elif nmr_sentences==2:
+        elif nmr_sentences == 2:
             ids = [1] * len(indexed_docs[0])
-            sep_id = dl_config.tokenizer.convert_tokens_to_ids("[SEP]")
+            sep_id = config.tokenizer.convert_tokens_to_ids("[SEP]")
             sep_pos = np.where(indexed_docs[id_doc] == sep_id)[0][0]
-            ids[:sep_pos+1] = [0] *  int(sep_pos+1)
+            ids[:sep_pos + 1] = [0] * int(sep_pos + 1)
             segment_ids.append(ids)
         mask = []
         for index in indexed_docs[id_doc]:
@@ -233,11 +237,11 @@ def Bert_preprocessing(x_set, y_set=None, dl_config=None, nmr_sentences=1, valid
                 mask.append(1)
             else:
                 mask.append(0)
-        masks.append(mask)    
+        masks.append(mask)
 
-    x_set = [np.asarray(indexed_docs, dtype='int32'), 
-               np.asarray(masks, dtype='int32'), 
-               np.asarray(segment_ids, dtype='int32')]
+    x_set = [np.asarray(indexed_docs, dtype='int32'),
+             np.asarray(masks, dtype='int32'),
+             np.asarray(segment_ids, dtype='int32')]
 
     if y_set is not None:
         y_set = np.asarray(y_set)
@@ -248,11 +252,11 @@ def Bert_preprocessing(x_set, y_set=None, dl_config=None, nmr_sentences=1, valid
         else:
             return x_set
     else:
-        x_train, y_train, x_val, y_val = train_val_split(x_set, y_set, validation_percentage=validation_percentage, seed_value=seed_value, model='bert')
+        x_train, y_train, x_val, y_val = train_val_split(x_set, y_set, validation_percentage=validation_percentage,
+                                                         seed_value=seed_value, model='bert')
         print('Training set with {} samples'.format(x_train[0].shape[0]))
         print('Validation set with {} samples'.format(x_val[0].shape[0]))
         return x_train, y_train, x_val, y_val
-
 
 
 def average_precision(y_test_df, yhat_probs):
@@ -271,14 +275,14 @@ def average_precision(y_test_df, yhat_probs):
     avg_prec /= len(gold_positive_ids)
     return avg_prec
 
-def plot_training_history(history_dict, dl_config=None, path=None):
+
+def plot_training_history(history_dict, config=None, path=None):
     acc = history_dict.history['accuracy']
     val_acc = history_dict.history['val_accuracy']
     loss = history_dict.history['loss']
     val_loss = history_dict.history['val_loss']
-    #f1_history = history_dict.history['f1_score']
-    #val_f1_history = history_dict.history['val_f1_score']
-
+    # f1_history = history_dict.history['f1_score']
+    # val_f1_history = history_dict.history['val_f1_score']
 
     epochs_plot = range(1, len(acc) + 1)
 
@@ -287,15 +291,15 @@ def plot_training_history(history_dict, dl_config=None, path=None):
     plt.rcParams['figure.figsize'] = [13, 5]
 
     f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
-    ax1.plot(epochs_plot, acc, label='Training acc', color = palette[0])
-    ax1.plot(epochs_plot, val_acc, label='Validation acc', color = palette[1])
+    ax1.plot(epochs_plot, acc, label='Training acc', color=palette[0])
+    ax1.plot(epochs_plot, val_acc, label='Validation acc', color=palette[1])
 
     ax1.set_title('Accuracy')
     ax1.set_xlabel('epochs')
     ax1.legend()
 
-    ax2.plot(epochs_plot, loss, label='Training loss', color = palette[0])
-    ax2.plot(epochs_plot, val_loss, label='Validation loss', color = palette[1])
+    ax2.plot(epochs_plot, loss, label='Training loss', color=palette[0])
+    ax2.plot(epochs_plot, val_loss, label='Validation loss', color=palette[1])
     ax2.set_title('Loss')
     ax2.set_xlabel('epochs')
     ax2.legend()
@@ -308,13 +312,13 @@ def plot_training_history(history_dict, dl_config=None, path=None):
     # f.tight_layout()
     # ax3.legend()
 
-    if dl_config:
-        f.savefig(dl_config.model_id_path / (dl_config.model_id + '_train'))
+    if config:
+        f.savefig(config.model_id_path / (config.model_id + '_train'))
     elif path:
         f.savefig(path)
 
 
-def plot_roc_n_pr_curves(y_test, yhat_probs, dl_config=None, path=None):
+def plot_roc_n_pr_curves(y_test, yhat_probs, config=None, path=None):
     f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
 
     ax1.plot([0, 1], [0, 1], linestyle='--', label='Random')
@@ -325,8 +329,8 @@ def plot_roc_n_pr_curves(y_test, yhat_probs, dl_config=None, path=None):
     ax1.set_ylabel('True Positive Rate')
     ax1.legend()
     ax1.set_title('ROC Curve')
-            
-    no_skill = len(y_test[y_test==1]) / len(y_test)
+
+    no_skill = len(y_test[y_test == 1]) / len(y_test)
     ax2.plot([0, 1], [no_skill, no_skill], linestyle='--', label='"No Skill"')
     precision, recall, _ = precision_recall_curve(y_test, yhat_probs)
     ax2.plot(recall, precision, marker='.', label='Trained Model')
@@ -336,8 +340,8 @@ def plot_roc_n_pr_curves(y_test, yhat_probs, dl_config=None, path=None):
     ax2.set_title('Precision-Recall Curve')
     pr_auc = auc(recall, precision)
 
-    if dl_config:
-        f.savefig(dl_config.model_id_path / (dl_config.model_id + '_test'))
+    if config:
+        f.savefig(config.model_id_path / (config.model_id + '_test'))
     elif path:
         f.savefig(path)
 

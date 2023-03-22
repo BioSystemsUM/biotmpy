@@ -3,9 +3,10 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from gensim.models.wrappers import FastText
 import numpy as np
 from gensim.models import KeyedVectors
+import codecs
 
 
-def compute_embedding_matrix(dl_config, embeddings_format, binary=True):
+def compute_embedding_matrix(config, embeddings_format, binary=True):
     """
     :param maxlen: We will cut reviews after n words
     :param training_samples: We will be training on x samples
@@ -13,10 +14,10 @@ def compute_embedding_matrix(dl_config, embeddings_format, binary=True):
     :param max_nb_words:  We will only consider the top z words in the dataset
     :return:
     """
-    embedding_path = dl_config.embedding_path
-    word_index = dl_config.tokenizer.word_index
-    embedding_dim = dl_config.embedding_dim
-    max_nb_words = dl_config.max_nb_words
+    embedding_path = config.embedding_path
+    word_index = config.tokenizer.word_index
+    embedding_dim = config.embedding_dim
+    max_nb_words = config.max_nb_words
     print('Creating Embedding Matrix...')
     total_nb_words = 0
     words_not_found = []
@@ -25,30 +26,30 @@ def compute_embedding_matrix(dl_config, embeddings_format, binary=True):
 
         with open(embedding_path, encoding='utf-8') as f:
             for line in f:
-                values = line.split()  #change to line.split (' ') on 840B glove
+                values = line.split()  # change to line.split (' ') on 840B glove
                 word = values[0]
                 coefs = np.asarray(values[1:], dtype='float32')
                 embeddings_index[word] = coefs
-        print('len word_index', len(word_index)+1)
+        print('len word_index', len(word_index) + 1)
         print(max_nb_words)
-        embedding_matrix = np.zeros((max_nb_words, embedding_dim))    #len(word_index)+1 or max_nb_words
+        embedding_matrix = np.zeros((max_nb_words, embedding_dim))  # len(word_index)+1 or max_nb_words
         for word, i in word_index.items():
-                embedding_vector = embeddings_index.get(word)
-                if i < max_nb_words:
-                    if embedding_vector is not None:
-                        # Words not found in embedding index will be all-zeros.
-                        embedding_matrix[i] = embedding_vector
-                        total_nb_words += 1
-                    else:
-                        words_not_found.append(word)
-                        total_nb_words+=1
+            embedding_vector = embeddings_index.get(word)
+            if i < max_nb_words:
+                if embedding_vector is not None:
+                    # Words not found in embedding index will be all-zeros.
+                    embedding_matrix[i] = embedding_vector
+                    total_nb_words += 1
+                else:
+                    words_not_found.append(word)
+                    total_nb_words += 1
 
     elif embeddings_format.lower() == 'word2vec' or embeddings_format.lower() == 'fasttext':
         model_vec = KeyedVectors.load_word2vec_format(embedding_path, binary=binary)
         num_words = min(max_nb_words, len(word_index) + 1)
         embedding_matrix = np.zeros((num_words, embedding_dim))
         for word, i in word_index.items():
-            total_nb_words+=1
+            total_nb_words += 1
             if i >= max_nb_words:
                 continue
             if word in model_vec.vocab:
@@ -60,13 +61,14 @@ def compute_embedding_matrix(dl_config, embeddings_format, binary=True):
             else:
                 words_not_found.append(word)
 
-    print('Embedding Matrix Created \n' + '-'*24)
+    print('Embedding Matrix Created \n' + '-' * 24)
     null_words = np.sum(np.sum(embedding_matrix, axis=1) == 0)
-    print('number of null word embeddings: {} in a total of {} words ({:.2%})'.format(null_words, total_nb_words, null_words/total_nb_words))
-    print('words not found:' , len(words_not_found))
+    print('number of null word embeddings: {} in a total of {} words ({:.2%})'.format(null_words, total_nb_words,
+                                                                                      null_words / total_nb_words))
+    print('words not found:', len(words_not_found))
     if len(words_not_found) > 15:
         print("e.g. 10 words not found in the index : ", np.random.choice(words_not_found, 15))
-    dl_config.embedding_matrix = embedding_matrix
+    config.embedding_matrix = embedding_matrix
     return embedding_matrix
 
 
@@ -91,7 +93,6 @@ def convert_to_binary(embedding_path):
             count += 1
     np.save(embedding_path + ".npy", np.array(wv))
 
-import codecs
 
 def load_embeddings_binary(embeddings_path):
     """
@@ -108,6 +109,7 @@ def load_embeddings_binary(embeddings_path):
         model[w] = wv[i]
     return model
 
+
 def get_w2v(sentence, model):
     """
     :param sentence: inputs a single sentences whose word embedding is to be extracted.
@@ -117,11 +119,7 @@ def get_w2v(sentence, model):
     return np.array([model.get(val, np.zeros(100)) for val in sentence.split()], dtype=np.float64)
 
 
-def glove_embeddings_2(dl_config):
-    embedding_path = dl_config.embedding_path
+def glove_embeddings_2(config):
+    embedding_path = config.embedding_path
     convert_to_binary(embedding_path)
     return load_embeddings_binary(embedding_path)
-
-
-
-

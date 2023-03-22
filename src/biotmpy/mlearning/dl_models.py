@@ -1,5 +1,5 @@
-from tensorflow.keras import regularizers
-from tensorflow.keras.models import Sequential
+from tensorflow import regularizers
+from tensorflow.models import Sequential
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dense, Activation, Dropout, Flatten, LSTM, RNN, Bidirectional, Flatten, Activation, \
     RepeatVector, Permute, Multiply, Lambda, Concatenate, BatchNormalization
@@ -21,19 +21,16 @@ from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import f1_score, recall_score, precision_score
 
 
-
-
-def Burns_CNNBiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
+def Burns_CNNBiLSTM(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
                     optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     sequence_input = Input(shape=(max_sent_len,), dtype='int32')
     activations = Embedding(vocab_size, embed_dim,
@@ -49,7 +46,7 @@ def Burns_CNNBiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learnin
     activations = Bidirectional(LSTM(64))(activations)
     activations = Dropout(0.4, seed=seed_value)(activations)
 
-    attention = Dense(1, activation='tanh')(activations) 
+    attention = Dense(1, activation='tanh')(activations)
     attention = Flatten()(attention)
     attention = Activation('softmax')(attention)
     attention = RepeatVector(128)(attention)
@@ -66,25 +63,25 @@ def Burns_CNNBiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learnin
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def Hierarchical_Attention_GRU(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                                   optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def Hierarchical_Attention_GRU(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                               optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -111,7 +108,7 @@ def Hierarchical_Attention_GRU(embedding_matrix, dl_config, n_classes=2, loss=No
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     print(wordEncoder.summary())
@@ -119,18 +116,18 @@ def Hierarchical_Attention_GRU(embedding_matrix, dl_config, n_classes=2, loss=No
     return model
 
 
-def Hierarchical_Attention_GRU2(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                                   optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def Hierarchical_Attention_GRU2(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                                optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -157,7 +154,7 @@ def Hierarchical_Attention_GRU2(embedding_matrix, dl_config, n_classes=2, loss=N
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     print(wordEncoder.summary())
@@ -165,18 +162,18 @@ def Hierarchical_Attention_GRU2(embedding_matrix, dl_config, n_classes=2, loss=N
     return model
 
 
-def Hierarchical_Attention_LSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                                   optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def Hierarchical_Attention_LSTM(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                                optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -204,7 +201,7 @@ def Hierarchical_Attention_LSTM(embedding_matrix, dl_config, n_classes=2, loss=N
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     print(wordEncoder.summary())
@@ -212,18 +209,18 @@ def Hierarchical_Attention_LSTM(embedding_matrix, dl_config, n_classes=2, loss=N
     return model
 
 
-def Hierarchical_Attention_LSTM2(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                                   optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def Hierarchical_Attention_LSTM2(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                                 optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -254,7 +251,7 @@ def Hierarchical_Attention_LSTM2(embedding_matrix, dl_config, n_classes=2, loss=
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     print(wordEncoder.summary())
@@ -265,19 +262,18 @@ def Hierarchical_Attention_LSTM2(embedding_matrix, dl_config, n_classes=2, loss=
     return model
 
 
-def Hierarchical_Attention_LSTM3(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                                   optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def Hierarchical_Attention_LSTM3(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                                 optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -307,7 +303,7 @@ def Hierarchical_Attention_LSTM3(embedding_matrix, dl_config, n_classes=2, loss=
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     print(wordEncoder.summary())
@@ -315,19 +311,18 @@ def Hierarchical_Attention_LSTM3(embedding_matrix, dl_config, n_classes=2, loss=
     return model
 
 
-def Hierarchical_Attention_Context(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
+def Hierarchical_Attention_Context(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
                                    optimizer=None, seed_value=None):
-
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
@@ -348,7 +343,7 @@ def Hierarchical_Attention_Context(embedding_matrix, dl_config, n_classes=2, los
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -357,25 +352,25 @@ def Hierarchical_Attention_Context(embedding_matrix, dl_config, n_classes=2, los
     return model
 
 
-def Bert_Dense(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_Dense(config, n_classes=2, loss=None, learning_rate=None,
+               optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+               bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     idx = Input((max_sent_len), dtype="int32", name="input_idx")
     masks = Input((max_sent_len), dtype="int32", name="input_masks")
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
-    
+
     ## pre-trained bert
     if bert_config:
-        bert_config = BertConfig.from_json_file(bert_name_or_path+ '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file(bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path)
     embedding = bert_model([idx, masks, segments])[0]
@@ -384,12 +379,10 @@ def Bert_Dense(dl_config, n_classes=2, loss=None, learning_rate=None,
     x = GlobalAveragePooling1D()(embedding)
     x = Dense(100, activation="relu")(x)
 
-
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(x)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(x)
-
 
     model = Model([idx, masks, segments], y_out)
 
@@ -397,53 +390,51 @@ def Bert_Dense(dl_config, n_classes=2, loss=None, learning_rate=None,
         for layer in model.layers[:4]:
             layer.trainable = False
 
-
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
     print(model.summary())
     return model
 
-def Bert_LSTM(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+
+def Bert_LSTM(config, n_classes=2, loss=None, learning_rate=None,
+              optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+              bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     idx = Input((max_sent_len), dtype="int32", name="input_idx")
     masks = Input((max_sent_len), dtype="int32", name="input_masks")
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
-    
+
     ## pre-trained bert
     if bert_config:
-        bert_config = BertConfig.from_json_file(bert_name_or_path+ '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file(bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path)
     embedding = bert_model([idx, masks, segments])[0]
 
     ## fine-tuning
-    x = Bidirectional(LSTM(50, return_sequences=True,  recurrent_dropout=0.1))(embedding)
+    x = Bidirectional(LSTM(50, return_sequences=True, recurrent_dropout=0.1))(embedding)
     x = Dropout(0.1, seed=seed_value)(x)
     x = GlobalAveragePooling1D()(x)
     x = Dense(62, activation="relu")(x)
     x = Dropout(0.2, seed=seed_value)(x)
 
-
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(x)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(x)
-
 
     model = Model([idx, masks, segments], y_out)
 
@@ -454,7 +445,7 @@ def Bert_LSTM(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -462,15 +453,14 @@ def Bert_LSTM(dl_config, n_classes=2, loss=None, learning_rate=None,
     return model
 
 
-
-
-def Bert_CLS(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_CLS(config, n_classes=2, loss=None, learning_rate=None,
+             optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+             bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if bert_config:
-        bert_config = BertConfig.from_json_file('./' +  bert_name_or_path + '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file('./' + bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path, config=bert_config)
 
@@ -479,14 +469,14 @@ def Bert_CLS(dl_config, n_classes=2, loss=None, learning_rate=None,
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
 
     embedding_layer = bert_model(idx, attention_mask=masks, token_type_ids=segments)[0]
-    cls_token = embedding_layer[:,0,:]
+    cls_token = embedding_layer[:, 0, :]
     X = BatchNormalization()(cls_token)
     X = Dense(192, activation='relu')(X)
     X = Dropout(0.2, seed=seed_value)(X)
 
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(X)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(X)
 
     model = Model([idx, masks, segments], y_out)
@@ -498,7 +488,7 @@ def Bert_CLS(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -506,52 +496,47 @@ def Bert_CLS(dl_config, n_classes=2, loss=None, learning_rate=None,
     return model
 
 
-
-
-def Bert_Sequence(dl_config, n_classes=2, loss=None, learning_rate=None,
-                         optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_Sequence(config, n_classes=2, loss=None, learning_rate=None,
+                  optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+                  bert_config=False):
+    max_sent_len = config.max_sent_len
     idx = Input((max_sent_len), dtype="int32", name="input_idx")
     masks = Input((max_sent_len), dtype="int32", name="input_masks")
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
     ## pre-trained bert
 
-
-    bert_config = BertConfig(num_labels=n_classes).output_hidden_states=False
+    bert_config = BertConfig(num_labels=n_classes).output_hidden_states = False
     bert_senquence = TFBertForSequenceClassification.from_pretrained(bert_name_or_path, config=bert_config)
     y_out = bert_senquence([idx, masks, segments])[0]
 
     model = Model([idx, masks, segments], y_out)
 
-
     if static_bert:
         for layer in model.layers[:4]:
             layer.trainable = False
 
-
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
-
 
     print(model.summary())
     return model
 
 
-def Burns_CNN(embedding_matrix, dl_config, n_classes=2, num_filters=64, weight_decay=1e-4, loss=None,
+def Burns_CNN(embedding_matrix, config, n_classes=2, num_filters=64, weight_decay=1e-4, loss=None,
               learning_rate=None, optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -569,24 +554,24 @@ def Burns_CNN(embedding_matrix, dl_config, n_classes=2, num_filters=64, weight_d
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def Burns_LSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+def Burns_LSTM(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+               optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -599,24 +584,24 @@ def Burns_LSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rat
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def Burns_CNN2(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+def Burns_CNN2(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+               optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -632,25 +617,24 @@ def Burns_CNN2(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rat
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def Burns_CNN3(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+def Burns_CNN3(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+               optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -666,24 +650,24 @@ def Burns_CNN3(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rat
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def Burns_BiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+def Burns_BiLSTM(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+                 optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -694,23 +678,23 @@ def Burns_BiLSTM(embedding_matrix, dl_config, n_classes=2, loss=None, learning_r
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
 
 
-def Chollet_DNN(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
+def Chollet_DNN(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
                 optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     model = Sequential()
     model.add(Embedding(vocab_size, embed_dim,
@@ -721,23 +705,22 @@ def Chollet_DNN(embedding_matrix, dl_config, n_classes=2, loss=None, learning_ra
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def DNN(dl_config, n_classes=2, loss=None, learning_rate=None,
-            optimizer=None, seed_value=None):
-
+def DNN(config, n_classes=2, loss=None, learning_rate=None,
+        optimizer=None, seed_value=None):
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-    embedding_dim = dl_config.embedding_dim
-    max_sent_len = dl_config.max_sent_len
+            learning_rate = config.learning_rate
+    embedding_dim = config.embedding_dim
+    max_sent_len = config.max_sent_len
     model = Sequential()
     model.add(Embedding(10_000, embedding_dim, input_length=max_sent_len))
     model.add(Dropout(0.5, seed=seed_value))
@@ -746,26 +729,26 @@ def DNN(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
     model.summary()
     return model
 
 
-def DeepDTA(embedding_matrix, dl_config, NUM_FILTERS=32, FILTER_LENGTH1=5, FILTER_LENGTH2=10, n_classes=2,
+def DeepDTA(embedding_matrix, config, NUM_FILTERS=32, FILTER_LENGTH1=5, FILTER_LENGTH2=10, n_classes=2,
             loss=None, learning_rate=None, optimizer=None, seed_value=None):
-    max_sent_len = dl_config.max_sent_len
+    max_sent_len = config.max_sent_len
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
     title_input = Input(shape=(max_sent_len), dtype='int32')  ### Buralar flagdan gelmeliii
     abstract_input = Input(shape=(max_sent_len,), dtype='int32')
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
+            learning_rate = config.learning_rate
 
     ### SMI_EMB_DINMS  FLAGS GELMELII
     encode_title = Embedding(vocab_size, embed_dim,
@@ -809,62 +792,55 @@ def DeepDTA(embedding_matrix, dl_config, NUM_FILTERS=32, FILTER_LENGTH1=5, FILTE
 
     final_Model = Model(inputs=[title_input, abstract_input], outputs=[predictions])
     final_Model = compile(model=final_Model,
-                    optimizer=optimizer,
-                    lr=learning_rate,
-                    dl_config=dl_config,
-                    loss=loss,
-                    n_classes=n_classes)
+                          optimizer=optimizer,
+                          lr=learning_rate,
+                          config=config,
+                          loss=loss,
+                          n_classes=n_classes)
 
     print(final_Model.summary())
 
     return final_Model
 
 
-def HAN_opt(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=None,
-                               optimizer=None, seed_value=None):
-
-
-    max_sent_len = dl_config.max_sent_len
-    max_nb_sentences = dl_config.max_nb_sentences
+def HAN_opt(embedding_matrix, config, n_classes=2, loss=None, learning_rate=None,
+            optimizer=None, seed_value=None):
+    max_sent_len = config.max_sent_len
+    max_nb_sentences = config.max_nb_sentences
     vocab_size = embedding_matrix.shape[0]
     embed_dim = embedding_matrix.shape[1]
 
-
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     embedding_layer = Embedding(vocab_size, embed_dim, weights=[embedding_matrix],
                                 input_length=max_sent_len, trainable=False, name='word_embedding')
-    
-    
+
     word_input = Input(shape=(max_sent_len,), dtype='int32')
     word = embedding_layer(word_input)
-    
+
     word = SpatialDropout1D(0.4, seed=seed_value)(word)
     word = Bidirectional(LSTM(128, return_sequences=True))(word)
     word_out = AttentionWithContext()(word)
     wordEncoder = Model(word_input, word_out)
 
-    
     sente_input = Input(shape=(max_nb_sentences, max_sent_len), dtype='int32')
     sente = TimeDistributed(wordEncoder)(sente_input)
-    sente = SpatialDropout1D(0.1, seed = seed_value)(sente)
-    
+    sente = SpatialDropout1D(0.1, seed=seed_value)(sente)
+
     sente = Bidirectional(LSTM(256, return_sequences=True))(sente)
 
     sente = AttentionWithContext()(sente)
     preds = Dense(1, activation='sigmoid')(sente)
     model = Model(sente_input, preds)
-        
 
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -872,44 +848,41 @@ def HAN_opt(embedding_matrix, dl_config, n_classes=2, loss=None, learning_rate=N
     return model
 
 
-def Bert_Dense_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=False, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_Dense_opt(config, n_classes=2, loss=None, learning_rate=None,
+                   optimizer=None, seed_value=None, static_bert=False, bert_name_or_path="bert-base-uncased",
+                   bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     idx = Input((max_sent_len), dtype="int32", name="input_idx")
     masks = Input((max_sent_len), dtype="int32", name="input_masks")
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
-    
+
     ## pre-trained bert
     if bert_config:
-        bert_config = BertConfig.from_json_file(bert_name_or_path+ '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file(bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path)
     embedding = bert_model([idx, masks, segments])[0]
 
     ## fine-tuning
     x = GlobalAveragePooling1D()(embedding)
-    x = Dropout(0.3, seed=dl_config.seed_value)(x)
+    x = Dropout(0.3, seed=config.seed_value)(x)
     x = Dense(64, activation="relu")(x)
 
-
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(x)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(x)
-
 
     model = Model([idx, masks, segments], y_out)
 
-    
     if static_bert:
         for layer in model.layers[:4]:
             layer.trainable = False
@@ -917,7 +890,7 @@ def Bert_Dense_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -925,25 +898,25 @@ def Bert_Dense_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     return model
 
 
-def Bert_LSTM_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_LSTM_opt(config, n_classes=2, loss=None, learning_rate=None,
+                  optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+                  bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if not learning_rate:
-        if not dl_config.learning_rate:
+        if not config.learning_rate:
             learning_rate = 0.001
         else:
-            learning_rate = dl_config.learning_rate
-
+            learning_rate = config.learning_rate
 
     idx = Input((max_sent_len), dtype="int32", name="input_idx")
     masks = Input((max_sent_len), dtype="int32", name="input_masks")
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
-    
+
     ## pre-trained bert
     if bert_config:
-        bert_config = BertConfig.from_json_file(bert_name_or_path+ '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file(bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path)
     embedding = bert_model([idx, masks, segments])[0]
@@ -957,19 +930,18 @@ def Bert_LSTM_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
         lstm_units = 64
         dropout_units = 0.2
         dense_units = 256
-    x = Bidirectional(LSTM(lstm_units, return_sequences=True,  recurrent_dropout=0.1))(embedding)
+    x = Bidirectional(LSTM(lstm_units, return_sequences=True, recurrent_dropout=0.1))(embedding)
     x = Dropout(dropout_units, seed=seed_value)(x)
     x = GlobalAveragePooling1D()(x)
     x = Dense(dense_units, activation="relu")(x)
 
     if not static_bert:
-        x = Dropout(0.4, seed=dl_config.seed_value)(x)
+        x = Dropout(0.4, seed=config.seed_value)(x)
 
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(x)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(x)
-
 
     model = Model([idx, masks, segments], y_out)
 
@@ -980,7 +952,7 @@ def Bert_LSTM_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
@@ -988,15 +960,14 @@ def Bert_LSTM_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     return model
 
 
-
-
-def Bert_CLS_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
-                optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased", bert_config=False):
-    max_sent_len = dl_config.max_sent_len
+def Bert_CLS_opt(config, n_classes=2, loss=None, learning_rate=None,
+                 optimizer=None, seed_value=None, static_bert=True, bert_name_or_path="bert-base-uncased",
+                 bert_config=False):
+    max_sent_len = config.max_sent_len
 
     if bert_config:
-        bert_config = BertConfig.from_json_file('./' +  bert_name_or_path + '/bert_config.json')
-        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config = bert_config)
+        bert_config = BertConfig.from_json_file('./' + bert_name_or_path + '/bert_config.json')
+        bert_model = TFBertModel.from_pretrained(bert_name_or_path, from_pt=True, config=bert_config)
     else:
         bert_model = TFBertModel.from_pretrained(bert_name_or_path, config=bert_config)
 
@@ -1005,7 +976,7 @@ def Bert_CLS_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     segments = Input((max_sent_len), dtype="int32", name="input_segments")
 
     embedding_layer = bert_model(idx, attention_mask=masks, token_type_ids=segments)[0]
-    cls_token = embedding_layer[:,0,:]
+    cls_token = embedding_layer[:, 0, :]
     if static_bert:
         dense_units = 64
         dropout_units = 0.2
@@ -1015,9 +986,9 @@ def Bert_CLS_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     X = Dense(dense_units, activation='relu')(cls_token)
     X = Dropout(dropout_units, seed=seed_value)(X)
 
-    if n_classes==2:
+    if n_classes == 2:
         y_out = Dense(1, activation='sigmoid')(X)
-    elif n_classes>2:
+    elif n_classes > 2:
         y_out = Dense(n_classes, activation='softmax')(X)
 
     model = Model([idx, masks, segments], y_out)
@@ -1029,10 +1000,9 @@ def Bert_CLS_opt(dl_config, n_classes=2, loss=None, learning_rate=None,
     model = compile(model=model,
                     optimizer=optimizer,
                     lr=learning_rate,
-                    dl_config=dl_config,
+                    config=config,
                     loss=loss,
                     n_classes=n_classes)
 
     print(model.summary())
     return model
-

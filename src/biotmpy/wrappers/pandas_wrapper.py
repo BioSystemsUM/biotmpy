@@ -1,12 +1,13 @@
-from src.biotmpy.data_structures import Document
-from src.biotmpy.data_structures.sentence import Sentence
-from src.biotmpy.data_structures import Token
-from src.biotmpy.data_structures.relevance import Relevance
+from biotmpy.data_structures import Document
+
+from biotmpy.data_structures import Token
+
 import pandas
+from typing import List
+from wrappers_utils import sort_list, get_doc_ids
 
-from wrappers_utils import *
 
-def docs_to_pandasdocs(docs):
+def docs_to_pandasdocs(docs: List[Document]) -> pandas.DataFrame:
     """
     Converts a list of Document objects to a pandas DataFrame.
 
@@ -59,41 +60,6 @@ def pandas_to_relevances(dataframe):
     pass
 
 
-def pandas_to_sentences(dataframe):
-    """
-    Converts a pandas DataFrame to a list of Sentence objects.
-
-    :param dataframe: pandas DataFrame
-
-    :return: list of Sentence objects
-    """
-    tokens = pandas_to_tokens(dataframe)
-    sentences = []
-    sent_tokens = []
-    s_id = -1
-    doc_id = -1
-    for t in tokens:
-        if s_id != t.sent_id or doc_id != t.doc_id:
-            if sent_tokens:
-                sentences.append(Sentence(sent, sent_tokens, sent_tokens[0].pos_i, sent_tokens[-1].pos_f))
-            sent = t.string
-            sent_tokens = [t]
-            s_id = t.sent_id
-            doc_id = t.doc_id
-            prev_tk_pos_f = t.pos_f
-        else:
-            spaces = ''
-            count_spaces = t.pos_i - prev_tk_pos_f
-            for i in range(count_spaces):
-                spaces += ' '
-            sent += spaces + t.string
-            sent_tokens.append(t)
-            prev_tk_pos_f = t.pos_f
-    if sent_tokens:
-        sentences.append(Sentence(sent, sent_tokens, sent_tokens[0].pos_i, sent_tokens[-1].pos_f))
-    return sentences
-
-
 def pandas_to_tokens(dataframe):
     """
     Converts a pandas DataFrame to a list of Token objects.
@@ -104,8 +70,6 @@ def pandas_to_tokens(dataframe):
     """
     tokens = indexes_to_tokens(dataframe)
     return sort_list(tokens)
-
-
 
 
 def indexing_series_tokens(dataframe):
@@ -127,20 +91,6 @@ def indexing_series_tokens(dataframe):
     return indexes
 
 
-def get_doc_ids(docs):
-    """
-    Gets the Document IDs from a list of Document objects.
-
-    :param docs: list of Document objects
-
-    :return: list of Document IDs
-    """
-    indexes = []
-    for d in docs:
-        indexes.append(d.id)
-    return indexes
-
-
 def indexes_to_tokens(dataframe):
     """
     Converts a pandas DataFrame to a list of Token objects.
@@ -155,6 +105,41 @@ def indexes_to_tokens(dataframe):
         tok = ind.split(' ')
         tokens.append(Token(tok[0], tok[3], int(tok[1]), int(tok[2]), int(tok[4]), tok[5]))
     return tokens
+
+# def pandas_to_sentences(dataframe):
+#     """
+#     Converts a pandas DataFrame to a list of Sentence objects.
+#
+#     :param dataframe: pandas DataFrame
+#
+#     :return: list of Sentence objects
+#     """
+#     tokens = pandas_to_tokens(dataframe)
+#     sentences = []
+#     sent_tokens = []
+#     s_id = -1
+#     doc_id = -1
+#     for t in tokens:
+#         if s_id != t.sent_id or doc_id != t.doc_id:
+#             if sent_tokens:
+#                 sentences.append(Sentence(sent, sent_tokens, sent_tokens[0].pos_i, sent_tokens[-1].pos_f))
+#             sent = t.string
+#             sent_tokens = [t]
+#             s_id = t.sent_id
+#             doc_id = t.doc_id
+#             prev_tk_pos_f = t.pos_f
+#         else:
+#             spaces = ''
+#             count_spaces = t.pos_i - prev_tk_pos_f
+#             for i in range(count_spaces):
+#                 spaces += ' '
+#             sent += spaces + t.string
+#             sent_tokens.append(t)
+#             prev_tk_pos_f = t.pos_f
+#     if sent_tokens:
+#         sentences.append(Sentence(sent, sent_tokens, sent_tokens[0].pos_i, sent_tokens[-1].pos_f))
+#     return sentences
+
 
 # def docs_to_pandastokens(docs):
 #     tokens = []
@@ -209,4 +194,3 @@ def indexes_to_tokens(dataframe):
 # def pandas_to_annot(dataframe):
 #     annots = indexes_to_annots(dataframe)
 #     return sort_list(annots)
-

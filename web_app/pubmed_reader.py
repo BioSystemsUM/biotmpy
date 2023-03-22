@@ -2,6 +2,7 @@ from Bio.Entrez import efetch, read
 from Bio import Entrez
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import nltk
 from src.biotmpy.data_structures import Document
@@ -11,8 +12,8 @@ from src.biotmpy.wrappers.dictionary_wrapper import get_sentences_dictionary, ge
 import string
 from pdftitle import get_title_from_io
 
-        
-def pmids_to_docs(pmids, email, dl_config):
+
+def pmids_to_docs(pmids, email, config):
     docs = []
     pmids_not_found = []
     for pmid in pmids:
@@ -22,22 +23,22 @@ def pmids_to_docs(pmids, email, dl_config):
             pmids_not_found.append(pmid)
         else:
             if data['Title'] != '':
-                sentences.extend(get_sentences_dictionary(data['Title'], passage_type = 't', 
-                                                doc_id=pmid, stop_words=dl_config.stop_words,
-                                                lower=dl_config.lower,
-                                                remove_punctuation=dl_config.remove_punctuation, 
-                                                split_by_hyphen=dl_config.split_by_hyphen,
-                                                lemmatization=dl_config.lemmatization,
-                                                stems=dl_config.stems))
+                sentences.extend(get_sentences_dictionary(data['Title'], passage_type='t',
+                                                          doc_id=pmid, stop_words=config.stop_words,
+                                                          lower=config.lower,
+                                                          remove_punctuation=config.remove_punctuation,
+                                                          split_by_hyphen=config.split_by_hyphen,
+                                                          lemmatization=config.lemmatization,
+                                                          stems=config.stems))
             if data['Abstract'] != '':
-                sentences.extend(get_sentences_dictionary(data['Abstract'], passage_type = 'a', 
-                                                doc_id=pmid, stop_words=dl_config.stop_words,
-                                                lower=dl_config.lower,
-                                                remove_punctuation=dl_config.remove_punctuation, 
-                                                split_by_hyphen=dl_config.split_by_hyphen,
-                                                lemmatization=dl_config.lemmatization,
-                                                stems=dl_config.stems))
-            if sentences:  
+                sentences.extend(get_sentences_dictionary(data['Abstract'], passage_type='a',
+                                                          doc_id=pmid, stop_words=config.stop_words,
+                                                          lower=config.lower,
+                                                          remove_punctuation=config.remove_punctuation,
+                                                          split_by_hyphen=config.split_by_hyphen,
+                                                          lemmatization=config.lemmatization,
+                                                          stems=config.stems))
+            if sentences:
                 doc = Document(sentences=sentences)
                 doc.raw_title = data['Title']
                 docs.append(doc)
@@ -46,12 +47,11 @@ def pmids_to_docs(pmids, email, dl_config):
     return docs, pmids_not_found
 
 
-
-#using PMID
+# using PMID
 def get_data_from_pmid(pmid, email):
     Entrez.email = email
-    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09' 
-    
+    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09'
+
     handle = efetch(db='pubmed', id=int(pmid), retmode='xml')
     xml_data = read(handle)
     handle.close()
@@ -61,40 +61,39 @@ def get_data_from_pmid(pmid, email):
         try:
             abstract = article['Abstract']['AbstractText'][0]
             return {'Title': title, 'Abstract': abstract}
-        except:
+        except KeyError:
             return {'Title': title, 'Abstract': ''}
-    except:
+    except KeyError:
         article = xml_data['PubmedBookArticle'][0]['BookDocument']
         title = article['ArticleTitle']
         try:
             abstract = article['Abstract']['AbstractText'][0]
             return {'Title': title, 'Abstract': abstract}
-        except:
+        except KeyError:
             return {'Title': title, 'Abstract': ''}
 
 
-
-
-#Using Term
-def term_to_docs(term, email, retmax, dl_config):
+# Using Term
+def term_to_docs(term, email, retmax, config):
     pmids = get_data_from_term(term, email, retmax)
     if pmids is None:
         return None
     else:
-        docs, pmids_not_found = pmids_to_docs(pmids, email, dl_config)
+        docs, pmids_not_found = pmids_to_docs(pmids, email, config)
         return docs
 
 
 def get_data_from_term(term, email, retmax):
     Entrez.email = email
-    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09' 
+    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09'
 
     handle = Entrez.esearch(db="pubmed", retmax=retmax, term=term, idtype="acc", sort='relevance')
     record = Entrez.read(handle)
     handle.close()
     return record['IdList']
 
-#Using pdfs
+
+# Using pdfs
 def pdf_paths_to_titles(pdf_paths, email):
     titles = []
     for pdf_path in pdf_paths:
@@ -102,7 +101,8 @@ def pdf_paths_to_titles(pdf_paths, email):
             titles.append(get_data_from_pdf(f, email))
     return titles
 
-def pdfs_to_docs(files, email, dl_config):
+
+def pdfs_to_docs(files, email, config):
     pmids = []
     docs_not_found = []
     try:
@@ -112,14 +112,15 @@ def pdfs_to_docs(files, email, dl_config):
                 pmids.append(pmid)
             else:
                 docs_not_found.append(file.filename)
-        docs, pmids_not_found = pmids_to_docs(pmids, email, dl_config)
+        docs, pmids_not_found = pmids_to_docs(pmids, email, config)
         return docs, docs_not_found
     except:
         return None, None
-        
+
+
 def get_data_from_pdf(file, email):
     Entrez.email = email
-    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09' 
+    Entrez.api_key = '0a925fca3ee9689bd778607f10e438fbfa09'
 
     try:
         title = get_title_from_io(file)
@@ -142,5 +143,5 @@ if __name__ == '__main__':
              'D:/Desktop/artigos/Mohan.pdf',
              'D:/Desktop/artigos/rdml.pdf',
              'D:/Desktop/artigos/Yan.pdf']
-    
+
     pdf_paths_to_titles(paths, '21nunoalves21@gmail.com')

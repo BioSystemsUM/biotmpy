@@ -6,16 +6,13 @@ from biotmpy.data_structures.sentence import Sentence
 
 from biotmpy.data_structures.relevance import Relevance
 
-from wrappers_utils import *
+import nltk
 
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('punkt')
-
+from biotmpy.wrappers.wrappers_utils import get_tokens
 
 
 def bioc_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True,
-                 lemmatization=False, stems=False, dl_config=None):
+                 lemmatization=False, stems=False, config=None):
     """
     Converts a bioc file to a list of Document objects with the following structure: Document -> Sentence -> Token.
 
@@ -26,17 +23,17 @@ def bioc_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, s
     :param split_by_hyphen: boolean, if True, words are split by hyphen and the hyphen is removed
     :param lemmatization: boolean, if True, words are lemmatized. For more details see https://www.nltk.org/book/ch03.html
     :param stems: boolean, if True, words are stemmed. For more details see https://www.nltk.org/book/ch03.html
-    :param dl_config: DLConfig object with the configuration for the deep learning model
+    :param config: DLConfig object with the configuration for the deep learning model
 
     :return: list of documents
     """
-    if dl_config:
-        stop_words = dl_config.stop_words
-        lower = dl_config.lower
-        remove_punctuation = dl_config.lower
-        split_by_hyphen = dl_config.split_by_hyphen
-        lemmatization = dl_config.lemmatization
-        stems = dl_config.stems
+    if config:
+        stop_words = config.stop_words
+        lower = config.lower
+        remove_punctuation = config.lower
+        split_by_hyphen = config.split_by_hyphen
+        lemmatization = config.lemmatization
+        stems = config.stems
 
     collection = bioc_file_reader(file)
     docs = []
@@ -94,7 +91,7 @@ def bioc_to_relevances(file, topic=None):
         for d in collection.documents:
             relevance = Relevance(d.infons["relevant"], d.id, topic)
             relevances.append(relevance)
-    except:
+    except KeyError:
         raise ValueError('Your file %s does not contain documents with an associated relevance.' % file)
     else:
         return relevances

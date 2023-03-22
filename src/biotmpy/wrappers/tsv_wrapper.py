@@ -1,10 +1,10 @@
-
 from src.biotmpy.data_structures import Document
 from src.biotmpy.data_structures.sentence import Sentence
 from src.biotmpy.data_structures import Token
 from src.biotmpy.data_structures.relevance import Relevance
 import nltk
 import pandas as pd
+
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')
@@ -14,7 +14,9 @@ from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 from wrappers_utils import *
 
-def tsv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False, stems=False, dl_config=None, sep='\t'):
+
+def tsv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, split_by_hyphen=True, lemmatization=False,
+                stems=False, config=None, sep='\t'):
     """
     Converts a tsv file to a list of Document objects. The tsv file must contain an id column, a title column, an abstract column and a label column.
 
@@ -25,18 +27,18 @@ def tsv_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, sp
     :param split_by_hyphen: boolean, if True, words are split by hyphen and the hyphen is removed
     :param lemmatization: boolean, if True, words are lemmatized. For more details see https://www.nltk.org/book/ch03.html
     :param stems: boolean, if True, words are stemmed. For more details see https://www.nltk.org/book/ch03.html
-    :param dl_config: Deep Learning Configuration object
+    :param config: Deep Learning Configuration object
     :param sep: separator of the tsv file
 
     :return: list of Document objects
     """
-    if dl_config:
-        stop_words = dl_config.stop_words
-        lower = dl_config.lower
-        remove_punctuation = dl_config.lower
-        split_by_hyphen = dl_config.split_by_hyphen
-        lemmatization = dl_config.lemmatization
-        stems = dl_config.stems
+    if config:
+        stop_words = config.stop_words
+        lower = config.lower
+        remove_punctuation = config.lower
+        split_by_hyphen = config.split_by_hyphen
+        lemmatization = config.lemmatization
+        stems = config.stems
 
     dataframe = tsv_file_reader(file, sep=sep)
     docs = []
@@ -77,7 +79,7 @@ def tsv_file_reader(file, sep='\t'):
     """
     dataframe = pd.read_csv(file, sep=sep)
     return standardize_headers(dataframe)
-    
+
 
 def standardize_headers(dataframe):
     """
@@ -91,7 +93,7 @@ def standardize_headers(dataframe):
     return dataframe
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     import sys
+
     sys.append('../')

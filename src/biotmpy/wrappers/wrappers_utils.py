@@ -1,9 +1,8 @@
 import string
+from typing import List
 
 import nltk
 from nltk import WordNetLemmatizer, PorterStemmer
-
-from wrappers_utils import *
 
 from biotmpy.data_structures import Document, Sentence, Token
 
@@ -69,8 +68,8 @@ def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuat
     sentences = []
     for s in sent:
         tokens = get_tokens(s, passage_type=passage_type, doc_id=doc_id, stop_words=stop_words, lower=lower,
-                                       remove_punctuation=remove_punctuation, split_by_hyphen=split_by_hyphen,
-                                       lemmatization=lemmatization, stems=stems)
+                            remove_punctuation=remove_punctuation, split_by_hyphen=split_by_hyphen,
+                            lemmatization=lemmatization, stems=stems)
         s = ''
         for i in range(len(tokens)):
             if i != len(tokens) - 1:
@@ -79,7 +78,7 @@ def get_sentences(text, passage_type, doc_id, stop_words, lower, remove_punctuat
                 s += tokens[i].string
         sentence = Sentence(s, tokens, passage_type=passage_type)
         sentences.append(sentence)
-    return
+    return sentences
 
 
 def get_tokens(text, doc_id=None, offset=0, passage_type=None, stop_words=None,
@@ -147,16 +146,6 @@ def get_tokens(text, doc_id=None, offset=0, passage_type=None, stop_words=None,
     return tokens
 
 
-def txt_file_reader(file):
-    """
-    :param file: path to the file
-
-    :return: dictionary with the documents
-    """
-    with open(file, 'r') as fp:
-        text = fp.readlines()
-    return text
-
 
 def sort_list(l):
     """
@@ -170,7 +159,7 @@ def sort_list(l):
     return l
 
 
-def txt_file_reader(file):
+def txt_file_reader(file: str) -> List[str]:
     """
     Reads a txt file
 
@@ -181,3 +170,17 @@ def txt_file_reader(file):
     with open(file, 'r') as fp:
         text = fp.readlines()
     return text
+
+
+def get_doc_ids(docs):
+    """
+    Gets the Document IDs from a list of Document objects.
+
+    :param docs: list of Document objects
+
+    :return: list of Document IDs
+    """
+    indexes = []
+    for d in docs:
+        indexes.append(d.id)
+    return indexes
