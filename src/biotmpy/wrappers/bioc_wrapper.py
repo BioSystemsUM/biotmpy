@@ -23,7 +23,7 @@ def bioc_to_docs(file, stop_words=None, lower=False, remove_punctuation=False, s
     :param split_by_hyphen: boolean, if True, words are split by hyphen and the hyphen is removed
     :param lemmatization: boolean, if True, words are lemmatized. For more details see https://www.nltk.org/book/ch03.html
     :param stems: boolean, if True, words are stemmed. For more details see https://www.nltk.org/book/ch03.html
-    :param config: DLConfig object with the configuration for the deep learning model
+    :param config: Config object with the configuration for the deep learning model
 
     :return: list of documents
     """

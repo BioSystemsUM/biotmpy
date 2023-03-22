@@ -31,7 +31,7 @@ from sklearn.metrics import confusion_matrix
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
-from src.biotmpy.mlearning import DLConfig
+from src.biotmpy.mlearning import Config
 from tensorflow.keras.preprocessing import text
 import nltk
 
@@ -153,8 +153,8 @@ our_sent = tokenizer.texts_to_sequences([x_train['Document'][0].fulltext_string]
 for i, tok in enumerate(x_train['Document'][0].fulltext_tokens):
     print(i, ': ', tok)
 
-config = DLConfig(path=path, tokenizer=tokenizer, max_sent_len=max_sent_len, max_nb_sentences=max_nb_sentences,
-                  embedding_dim=embedding_dim, embedding_path=embedding_path, max_nb_words=max_nb_words)
+config = Config(path=path, tokenizer=tokenizer, max_sent_len=max_sent_len, max_nb_sentences=max_nb_sentences,
+                embedding_dim=embedding_dim, embedding_path=embedding_path, max_nb_words=max_nb_words)
 
 # x_train, y_train, x_val, y_val = DL_preprocessing(x_train, y_train, config, set='train',
 #                                     validation_percentage = validation_percentage, seed_value=seed_value,

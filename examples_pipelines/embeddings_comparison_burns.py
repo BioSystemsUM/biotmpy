@@ -72,7 +72,7 @@ from sklearn.metrics import confusion_matrix
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.models import load_model
 from src.biotmpy.mlearning import plot_training_history
-from src.biotmpy.mlearning import DLConfig
+from src.biotmpy.mlearning import Config
 from src.biotmpy.mlearning import average_precision
 from tensorflow.keras.preprocessing import text
 from src.biotmpy.mlearning import plot_roc_n_pr_curves
@@ -94,7 +94,7 @@ import pickle
 train_dataset_path = '../data/PMtask_Triage_TrainingSet.xml'
 test_dataset_path = '../data/PMtask_Triage_TestSet.xml'
 
-config = DLConfig(model_name=model_name, seed_value=seed_value)
+config = Config(model_name=model_name, seed_value=seed_value)
 config.stop_words = set(stopwords.words('english'))
 # config.stop_words = None
 config.lower = True
