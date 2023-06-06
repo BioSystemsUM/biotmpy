@@ -8,5 +8,13 @@ class Paper:
                             'Chemicals':[],
                             'Gene_Proteins':[],
                             'Organisms':[]}
+        
+        self.annotations_scispacy = {'Diseases':[],
+                    'Chemicals':[],
+                    'Gene_Proteins':[],
+                    'Organisms':[]}
         if query_keyword:
             self.query_keyword = query_keyword
+
+        self.title_abstract = self.title + self.abstract
+        
