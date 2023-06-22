@@ -1,5 +1,5 @@
 class Paper:
-    def __init__(self, id, title, abstract, source=None, query_keyword=None): 
+    def __init__(self, id, title, abstract, source=None, date_publication = None, query_keyword=None): 
         self.id = id
         self.title = title
         self.abstract = abstract
@@ -13,6 +13,9 @@ class Paper:
                                         'Chemicals':[],
                                         'Gene_Proteins':[],
                                         'Organisms':[]}
+        
+        if date_publication:
+            self.date_publication = date_publication
         
      
         if query_keyword:
