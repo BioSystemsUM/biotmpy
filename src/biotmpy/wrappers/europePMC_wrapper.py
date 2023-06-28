@@ -9,10 +9,13 @@ import tqdm
 import time
 from requests.exceptions import RequestException
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Dict
+from typing import Optional
+from typing import Any
 
-## API
+## API 
 
-def pmc_to_list(term): 
+def pmc_to_list(term:str)-> List[Dict[str,str]]: 
     """
     Function that returns a list of articles from Europe PMC that match the provided search term (keyword).
 
@@ -23,7 +26,7 @@ def pmc_to_list(term):
     A list of dictionaries representing the Europe PMC articles that match the search term.
     Each dictionary contains information about an article, such as ID, title, abstract, etc."""
 
-    results = []
+    results:List[Dict[str,str]] = []
     print('getting papers')
     url = f'https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(TITLE:"{term}" OR ABSTRACT:"{term}")&pageSize=1000&resultType=core&format=json' 
 
@@ -41,7 +44,7 @@ def pmc_to_list(term):
     return results
 
 
-def list_to_paper_instances(paper_list, keyword=None):  
+def list_to_paper_instances(paper_list: List[Dict[str,str]], keyword:Optional[str]=None):  
     """
     Function that converts a list of dictionaries representing articles into instances of the Paper class.
     
@@ -53,13 +56,13 @@ def list_to_paper_instances(paper_list, keyword=None):
     A list of Paper instances created from the provided article dictionaries.
     Only articles containing the keyword "target" in their title or abstract will be included in the result."""
 
-    paper_instances = []
+    paper_instances:List[Paper] = []
     for paper_dict in paper_list:
         pmid = paper_dict['id']
         title = paper_dict['title']
         abstract = paper_dict.get('abstractText', '')  
         source = paper_dict.get('source')
-        date_publication = paper_dict.get('dateOfPublication', None)
+        date_publication = paper_dict.get('pubYear', None)
         paper_obj = Paper(pmid, title, abstract, source, date_publication, query_keyword=keyword)
 
         if 'target' in paper_obj.title_abstract:
@@ -68,7 +71,7 @@ def list_to_paper_instances(paper_list, keyword=None):
     return paper_instances
 
 
-def get_annotations_paper_instances(paper_instances, n_workers=10, max_attempts=3):
+def get_annotations_paper_instances(paper_instances: List[Paper], n_workers:int=10, max_attempts:int =3)->List[List[Dict[str,List[str]]]]:
     """ 
     Function that retrieves annotations for a list of Paper instances using multiple threads.
 
@@ -81,7 +84,7 @@ def get_annotations_paper_instances(paper_instances, n_workers=10, max_attempts=
     A list of annotations corresponding to the provided Paper instances.
     The annotations are retrieved using multiple threads for improved efficiency."""
 
-    instances_annotations = []
+    instances_annotations:List[List[Dict[str,List[str]]]] = []
     with requests.Session() as session:
         with ThreadPoolExecutor(max_workers=n_workers) as executor:
             futures = []
@@ -103,7 +106,7 @@ def get_annotations_paper_instances(paper_instances, n_workers=10, max_attempts=
 
 #API ANNOTATIONS 
 
-def get_annotations(paper_instance, session, max_attempts=5):
+def get_annotations(paper_instance:Paper, session, max_attempts:int=5)->Paper:
     """
     Function that retrieves annotations for a specific Paper instance from the Europe PMC annotations API.
 
@@ -137,7 +140,7 @@ def get_annotations(paper_instance, session, max_attempts=5):
     return paper_instance
 
 
-def annotations_to_dict(json_anotations, paper_instance):
+def annotations_to_dict(json_anotations:Dict[str, Any], paper_instance:Paper)->Paper:
     """
     Function that converts annotations from a JSON format to a dictionary and adds them to a Paper instance.
 
@@ -162,7 +165,7 @@ def annotations_to_dict(json_anotations, paper_instance):
 
 
          
-def pmc_to_papers(keyword):
+def pmc_to_papers(keyword:str)->List[Paper]:
     """
     Function that retrieves a list of Paper instances from Europe PMC based on a given keyword.
 
@@ -172,8 +175,8 @@ def pmc_to_papers(keyword):
     Returns:
         A list of Paper instances representing the papers obtained from Europe PMC. Each Paper instance contains information such as ID, title, abstract, etc.
     """
-    pmc_results = pmc_to_list(keyword)
-    paper_instances = list_to_paper_instances(pmc_results, keyword)
+    pmc_results:List[Dict[str,Any]] = pmc_to_list(keyword)
+    paper_instances:List[Paper] = list_to_paper_instances(pmc_results, keyword)
     return paper_instances
 
 
